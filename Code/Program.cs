@@ -281,10 +281,10 @@ namespace DbScripter
 				throw new Exception("File \"" + Filename + "\" already exists.");
 			}
 
-			UserDefinedFunctionCollection Udfs = Db.UserDefinedFunctions;
+			UserDefinedFunctionCollection DbObjs = Db.UserDefinedFunctions;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Udfs - Begin.");
-			Console.WriteLine("Scripting Udfs - Udfs.Count = " + Udfs.Count + ".");
+			Console.WriteLine("Scripting Udfs - DbObjs.Count = " + DbObjs.Count + ".");
 
 			ScriptingOptions so = new ScriptingOptions();
 			so.Add(ScriptOption.DriAll);
@@ -293,9 +293,9 @@ namespace DbScripter
 			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
 			{
 				File.WriteLine();
-				for (int i = 0; i < Udfs.Count; i++)
+				for (int i = 0; i < DbObjs.Count; i++)
 				{
-					UserDefinedFunction DbObj = Udfs[i];
+					UserDefinedFunction DbObj = DbObjs[i];
 					if (DbObj.IsSystemObject)
 					{
 						continue;

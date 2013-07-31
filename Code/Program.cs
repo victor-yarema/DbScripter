@@ -382,7 +382,6 @@ namespace DbScripter
 			{
 				sw.WriteLine(s);
 			}
-			sw.WriteLine();
 		}
 
 	}

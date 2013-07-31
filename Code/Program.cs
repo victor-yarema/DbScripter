@@ -103,10 +103,10 @@ namespace DbScripter
 				throw new Exception("File \"" + Filename + "\" already exists.");
 			}
 
-			DefaultCollection Defaults = Db.Defaults;
+			DefaultCollection DbObjs = Db.Defaults;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Defaults - Begin.");
-			Console.WriteLine("Scripting Defaults - Defaults.Count = " + Defaults.Count + ".");
+			Console.WriteLine("Scripting Defaults - DbObjs.Count = " + DbObjs.Count + ".");
 
 			ScriptingOptions so = new ScriptingOptions();
 			so.Add(ScriptOption.DriAll);
@@ -115,9 +115,9 @@ namespace DbScripter
 			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
 			{
 				File.WriteLine();
-				for (int i = 0; i < Defaults.Count; i++)
+				for (int i = 0; i < DbObjs.Count; i++)
 				{
-					Default DbObj = Defaults[i];
+					Default DbObj = DbObjs[i];
 					File.WriteLine();
 					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);

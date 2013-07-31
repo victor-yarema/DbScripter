@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text;
-using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
+using Time;
 
 
 namespace DBScripter
@@ -109,6 +109,7 @@ namespace DBScripter
 		static void ScriptDefaults(Database Db, string Filename)
 		{
 			DefaultCollection Defaults = Db.Defaults;
+			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Defaults - Begin.");
 			Console.WriteLine("Scripting Defaults - Defaults.Count = " + Defaults.Count + ".");
 
@@ -126,12 +127,14 @@ namespace DBScripter
 					StreamWriter_Write_StringCollection(File, Script);
 				}
 			}
-			Console.WriteLine("Scripting Defaults - End.");
+			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			Console.WriteLine("Scripting Defaults - End. TimeInterval = " + TimeInterval + " .");
 		}
 
 		static void ScriptUddts(Database Db, string Filename)
 		{
 			UserDefinedDataTypeCollection Uddts = Db.UserDefinedDataTypes;
+			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Uddts - Begin.");
 			Console.WriteLine("Scripting Uddts - Uddts.Count = " + Uddts.Count + ".");
 
@@ -149,12 +152,14 @@ namespace DBScripter
 					StreamWriter_Write_StringCollection(File, Script);
 				}
 			}
-			Console.WriteLine("Scripting Uddts - End.");
+			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			Console.WriteLine("Scripting Uddts - End. TimeInterval = " + TimeInterval + " .");
 		}
 
 		static void ScriptUdtts(Database Db, string Filename)
 		{
 			UserDefinedTableTypeCollection Udtts = Db.UserDefinedTableTypes;
+			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Udtts - Begin.");
 			Console.WriteLine("Scripting Udtts - Udtts.Count = " + Udtts.Count + ".");
 
@@ -172,12 +177,14 @@ namespace DBScripter
 					StreamWriter_Write_StringCollection(File, Script);
 				}
 			}
-			Console.WriteLine("Scripting Udtts - End.");
+			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			Console.WriteLine("Scripting Udtts - End. TimeInterval = " + TimeInterval + " .");
 		}
 
 		static void ScriptTables(Database Db, string Filename)
 		{
 			TableCollection Tables = Db.Tables;
+			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Tables - Begin.");
 			Console.WriteLine("Scripting Tables - Tables.Count = " + Tables.Count + ".");
 
@@ -205,12 +212,14 @@ namespace DBScripter
 					StreamWriter_Write_StringCollection(File, Script);
 				}
 			}
-			Console.WriteLine("Scripting Tables - End.");
+			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			Console.WriteLine("Scripting Tables - End. TimeInterval = " + TimeInterval + " .");
 		}
 
 		static void ScriptViews(Database Db, string Filename)
 		{
 			ViewCollection Views = Db.Views;
+			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Views - Begin.");
 			Console.WriteLine("Scripting Views - Views.Count = " + Views.Count + ".");
 
@@ -233,12 +242,14 @@ namespace DBScripter
 					StreamWriter_Write_StringCollection(File, Script);
 				}
 			}
-			Console.WriteLine("Scripting Views - End.");
+			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			Console.WriteLine("Scripting Views - End. TimeInterval = " + TimeInterval + " .");
 		}
 
 		static void ScriptUdfs(Database Db, string Filename)
 		{
 			UserDefinedFunctionCollection Udfs = Db.UserDefinedFunctions;
+			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Udfs - Begin.");
 			Console.WriteLine("Scripting Udfs - Udfs.Count = " + Udfs.Count + ".");
 
@@ -261,12 +272,14 @@ namespace DBScripter
 					StreamWriter_Write_StringCollection(File, Script);
 				}
 			}
-			Console.WriteLine("Scripting Udfs - End.");
+			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			Console.WriteLine("Scripting Udfs - End. TimeInterval = " + TimeInterval + " .");
 		}
 
 		static void ScriptSps(Database Db, string Filename)
 		{
 			StoredProcedureCollection Sps = Db.StoredProcedures;
+			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Sps - Begin.");
 			Console.WriteLine("Scripting Sps - Sps.Count = " + Sps.Count + ".");
 
@@ -317,7 +330,8 @@ namespace DBScripter
 					StreamWriter_Write_StringCollection(File, Script);
 				}
 			}
-			Console.WriteLine("Scripting Sps - End.");
+			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			Console.WriteLine("Scripting Sps - End. TimeInterval = " + TimeInterval + " .");
 		}
 
 		/*

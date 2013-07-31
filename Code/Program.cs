@@ -98,6 +98,11 @@ namespace DbScripter
 
 		static void ScriptDefaults(Database Db, string Filename)
 		{
+			if (System.IO.File.Exists(Filename))
+			{
+				throw new Exception("File \"" + Filename + "\" already exists.");
+			}
+
 			DefaultCollection Defaults = Db.Defaults;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Defaults - Begin.");
@@ -126,6 +131,11 @@ namespace DbScripter
 
 		static void ScriptUddts(Database Db, string Filename)
 		{
+			if (System.IO.File.Exists(Filename))
+			{
+				throw new Exception("File \"" + Filename + "\" already exists.");
+			}
+
 			UserDefinedDataTypeCollection Uddts = Db.UserDefinedDataTypes;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Uddts - Begin.");
@@ -154,6 +164,11 @@ namespace DbScripter
 
 		static void ScriptUdtts(Database Db, string Filename)
 		{
+			if (System.IO.File.Exists(Filename))
+			{
+				throw new Exception("File \"" + Filename + "\" already exists.");
+			}
+
 			UserDefinedTableTypeCollection Udtts = Db.UserDefinedTableTypes;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Udtts - Begin.");
@@ -182,6 +197,11 @@ namespace DbScripter
 
 		static void ScriptTables(Database Db, string Filename)
 		{
+			if (System.IO.File.Exists(Filename))
+			{
+				throw new Exception("File \"" + Filename + "\" already exists.");
+			}
+
 			TableCollection Tables = Db.Tables;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Tables - Begin.");
@@ -219,6 +239,11 @@ namespace DbScripter
 
 		static void ScriptViews(Database Db, string Filename)
 		{
+			if (System.IO.File.Exists(Filename))
+			{
+				throw new Exception("File \"" + Filename + "\" already exists.");
+			}
+
 			ViewCollection Views = Db.Views;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Views - Begin.");
@@ -251,6 +276,11 @@ namespace DbScripter
 
 		static void ScriptUdfs(Database Db, string Filename)
 		{
+			if (System.IO.File.Exists(Filename))
+			{
+				throw new Exception("File \"" + Filename + "\" already exists.");
+			}
+
 			UserDefinedFunctionCollection Udfs = Db.UserDefinedFunctions;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Udfs - Begin.");
@@ -283,6 +313,11 @@ namespace DbScripter
 
 		static void ScriptSps(Database Db, string Filename)
 		{
+			if (System.IO.File.Exists(Filename))
+			{
+				throw new Exception("File \"" + Filename + "\" already exists.");
+			}
+
 			StoredProcedureCollection Sps = Db.StoredProcedures;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Sps - Begin.");

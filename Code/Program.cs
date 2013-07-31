@@ -244,10 +244,10 @@ namespace DbScripter
 				throw new Exception("File \"" + Filename + "\" already exists.");
 			}
 
-			ViewCollection Views = Db.Views;
+			ViewCollection DbObjs = Db.Views;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Views - Begin.");
-			Console.WriteLine("Scripting Views - Views.Count = " + Views.Count + ".");
+			Console.WriteLine("Scripting Views - DbObjs.Count = " + DbObjs.Count + ".");
 
 			ScriptingOptions so = new ScriptingOptions();
 			so.Add(ScriptOption.DriAll);
@@ -256,9 +256,9 @@ namespace DbScripter
 			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
 			{
 				File.WriteLine();
-				for (int i = 0; i < Views.Count; i++)
+				for (int i = 0; i < DbObjs.Count; i++)
 				{
-					View DbObj = Views[i];
+					View DbObj = DbObjs[i];
 					if (DbObj.IsSystemObject)
 					{
 						continue;

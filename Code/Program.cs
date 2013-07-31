@@ -7,7 +7,7 @@ using Microsoft.SqlServer.Management.Smo;
 using Time;
 
 
-namespace DbScripter_tmp
+namespace DbScripter
 {
 	class Program
 	{

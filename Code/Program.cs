@@ -169,10 +169,10 @@ namespace DbScripter
 				throw new Exception("File \"" + Filename + "\" already exists.");
 			}
 
-			UserDefinedTableTypeCollection Udtts = Db.UserDefinedTableTypes;
+			UserDefinedTableTypeCollection DbObjs = Db.UserDefinedTableTypes;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Udtts - Begin.");
-			Console.WriteLine("Scripting Udtts - Udtts.Count = " + Udtts.Count + ".");
+			Console.WriteLine("Scripting Udtts - DbObjs.Count = " + DbObjs.Count + ".");
 
 			ScriptingOptions so = new ScriptingOptions();
 			so.Add(ScriptOption.DriAll);
@@ -181,9 +181,9 @@ namespace DbScripter
 			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
 			{
 				File.WriteLine();
-				for (int i = 0; i < Udtts.Count; i++)
+				for (int i = 0; i < DbObjs.Count; i++)
 				{
-					UserDefinedTableType DbObj = Udtts[i];
+					UserDefinedTableType DbObj = DbObjs[i];
 					File.WriteLine();
 					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);

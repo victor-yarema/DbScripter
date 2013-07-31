@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DBScripter")]
+[assembly: AssemblyTitle("DbScripter_tmp")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("IL")]
-[assembly: AssemblyProduct("DBScripter")]
+[assembly: AssemblyProduct("DbScripter_tmp")]
 [assembly: AssemblyCopyright("Copyright © IL 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

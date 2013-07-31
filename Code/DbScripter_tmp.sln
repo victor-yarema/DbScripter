@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBScripter", "DBScripter.csproj", "{20ABB0FD-E40C-4C3B-A057-B841E1856D0C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbScripter_tmp", "DbScripter_tmp.csproj", "{20ABB0FD-E40C-4C3B-A057-B841E1856D0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

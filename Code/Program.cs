@@ -318,10 +318,10 @@ namespace DbScripter
 				throw new Exception("File \"" + Filename + "\" already exists.");
 			}
 
-			StoredProcedureCollection Sps = Db.StoredProcedures;
+			StoredProcedureCollection DbObjs = Db.StoredProcedures;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Sps - Begin.");
-			Console.WriteLine("Scripting Sps - Sps.Count = " + Sps.Count + ".");
+			Console.WriteLine("Scripting Sps - DbObjs.Count = " + DbObjs.Count + ".");
 
 			ScriptingOptions so = new ScriptingOptions();
 			so.Add(ScriptOption.DriAll);
@@ -331,9 +331,9 @@ namespace DbScripter
 			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
 			{
 				File.WriteLine();
-				for (int i = 0; i < Sps.Count; i++)
+				for (int i = 0; i < DbObjs.Count; i++)
 				{
-					StoredProcedure DbObj = Sps[i];
+					StoredProcedure DbObj = DbObjs[i];
 					if (DbObj.IsSystemObject)
 					{
 						continue;

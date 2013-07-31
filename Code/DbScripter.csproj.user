@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>/s localhost /d GnolSkeleton /f DbScript</StartArguments>
+    <StartArguments>/s localhost /d GnolSkeleton /f GS</StartArguments>
     <StartWorkingDirectory>C:\Work\_Internal\DbScripter\Code\Data\</StartWorkingDirectory>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
   </PropertyGroup>

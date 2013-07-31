@@ -11,8 +11,6 @@ namespace DbScripter
 {
 	class Program
 	{
-		//static private DateTime Start;
-
 		static void Main(string[] args)
 		{
 			try
@@ -81,7 +79,6 @@ namespace DbScripter
 				Server_.ConnectionContext.LoginSecure = true;
 				//Server_.ConnectionContext.Login = "sa";
 				//Server_.ConnectionContext.Password = "q";
-				//Server_.ConnectionContext.Connect();
 
 				Database Db = Server_.Databases[DatabaseName];
 
@@ -92,13 +89,6 @@ namespace DbScripter
 				ScriptViews(Db, FilenamePrefix + " 04 Views.sql");
 				ScriptUdfs(Db, FilenamePrefix + " 05 Udfs.sql");
 				ScriptSps(Db, FilenamePrefix + " 06 Sps.sql");
-
-				/*
-				if (Server_.ConnectionContext.IsOpen)
-				{
-					Server_.ConnectionContext.Disconnect();
-				}
-				*/
 			}
 			catch (Exception ex)
 			{
@@ -205,7 +195,6 @@ namespace DbScripter
 					Table DbObj = Tables[i];
 					if (DbObj.IsSystemObject)
 					{
-						//Console.WriteLine("Table \"" + DbObj.Name + "\" IsSystemObject.");
 						continue;
 					}
 					StringCollection Script = DbObj.Script(so);
@@ -235,7 +224,6 @@ namespace DbScripter
 					View DbObj = Views[i];
 					if (DbObj.IsSystemObject)
 					{
-						//Console.WriteLine("View \"" + DbObj.Name + "\" IsSystemObject.");
 						continue;
 					}
 					StringCollection Script = DbObj.Script(so);
@@ -265,7 +253,6 @@ namespace DbScripter
 					UserDefinedFunction DbObj = Udfs[i];
 					if (DbObj.IsSystemObject)
 					{
-						//Console.WriteLine("Udf \"" + DbObj.Name + "\" IsSystemObject.");
 						continue;
 					}
 					StringCollection Script = DbObj.Script(so);
@@ -296,7 +283,6 @@ namespace DbScripter
 					StoredProcedure DbObj = Sps[i];
 					if (DbObj.IsSystemObject)
 					{
-						//Console.WriteLine("Sp \"" + DbObj.Name + "\" IsSystemObject.");
 						continue;
 					}
 					StringCollection Script = DbObj.Script(so);
@@ -333,31 +319,6 @@ namespace DbScripter
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
 			Console.WriteLine("Scripting Sps - End. TimeInterval = " + TimeInterval + " .");
 		}
-
-		/*
-		static void StartWrite(string Filename)
-		{
-			Start = DateTime.UtcNow;
-			StreamWriter sw = new StreamWriter(Filename, false, Encoding.Unicode);
-			sw.Close();
-		}
-
-		static void WriteToFile(string Filename, StringCollection StringBlocks)
-		{
-			StreamWriter sw = new StreamWriter(Filename, true, Encoding.Unicode);
-			foreach (string block in StringBlocks)
-			{
-				sw.WriteLine(block);
-			}
-			if (DateTime.UtcNow > Start.AddSeconds(1))
-			{
-				Console.Write(".");
-				Start = DateTime.UtcNow;
-			}
-			sw.Close();
-		}
-
-		*/
 
 		static void StreamWriter_Write_StringCollection(StreamWriter sw, StringCollection sc)
 		{

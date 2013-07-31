@@ -113,8 +113,11 @@ namespace DbScripter
 				for (int i = 0; i < Defaults.Count; i++)
 				{
 					Default DbObj = Defaults[i];
+					File.WriteLine();
+					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);
 					StreamWriter_Write_StringCollection(File, Script);
+					File.WriteLine();
 				}
 			}
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
@@ -138,8 +141,11 @@ namespace DbScripter
 				for (int i = 0; i < Uddts.Count; i++)
 				{
 					UserDefinedDataType DbObj = Uddts[i];
+					File.WriteLine();
+					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);
 					StreamWriter_Write_StringCollection(File, Script);
+					File.WriteLine();
 				}
 			}
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
@@ -163,8 +169,11 @@ namespace DbScripter
 				for (int i = 0; i < Udtts.Count; i++)
 				{
 					UserDefinedTableType DbObj = Udtts[i];
+					File.WriteLine();
+					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);
 					StreamWriter_Write_StringCollection(File, Script);
+					File.WriteLine();
 				}
 			}
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
@@ -197,8 +206,11 @@ namespace DbScripter
 					{
 						continue;
 					}
+					File.WriteLine();
+					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);
 					StreamWriter_Write_StringCollection(File, Script);
+					File.WriteLine();
 				}
 			}
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
@@ -226,8 +238,11 @@ namespace DbScripter
 					{
 						continue;
 					}
+					File.WriteLine();
+					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);
 					StreamWriter_Write_StringCollection(File, Script);
+					File.WriteLine();
 				}
 			}
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
@@ -255,8 +270,11 @@ namespace DbScripter
 					{
 						continue;
 					}
+					File.WriteLine();
+					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);
 					StreamWriter_Write_StringCollection(File, Script);
+					File.WriteLine();
 				}
 			}
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
@@ -285,6 +303,8 @@ namespace DbScripter
 					{
 						continue;
 					}
+					File.WriteLine();
+					File.WriteLine();
 					StringCollection Script = DbObj.Script(so);
 
 					/*
@@ -314,6 +334,7 @@ namespace DbScripter
 					*/
 
 					StreamWriter_Write_StringCollection(File, Script);
+					File.WriteLine();
 				}
 			}
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);

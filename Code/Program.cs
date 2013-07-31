@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.Specialized;
 using System.IO;
-
+using System.Text;
+using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 
 
@@ -11,118 +11,326 @@ namespace DBScripter
 {
 	class Program
 	{
-		static private DateTime Start;
+		//static private DateTime Start;
+
 		static void Main(string[] args)
 		{
-			string ServerAddress = null;
-			string DatabaseName = null;
-			string FileNamePrefix = null;
-
-			for (int i = 0; i < args.Length; i++)
+			try
 			{
-				switch ( args[i].ToLower() )
+				string ServerAddress = null;
+				string DatabaseName = null;
+				string FilenamePrefix = null;
+
+				for (int arg_index = 0; arg_index < args.Length; arg_index++)
 				{
-					case "/s":
+					switch (args[arg_index].ToLower())
 					{
-						if ( ServerAddress != null )
-						{
-							throw new Exception("Multiple keys for ServerAddress.");
-						}
-						if ( ! ( i + 1 < args.Length ) )
-						{
-							throw new Exception("Missing ServerAddress after corresponding key.");
-						}
-						ServerAddress = args[ i + 1 ];
-					}break;
-					case "/d":
-					{
-						if ( DatabaseName != null )
-						{
-							throw new Exception("Multiple keys for DatabaseName.");
-						}
-						if ( ! ( i + 1 < args.Length ) )
-						{
-							throw new Exception("Missing DatabaseName after corresponding key.");
-						}
-						DatabaseName = args[ i + 1 ];
-					}break;
-					case "/f":
-					{
-						if ( FileNamePrefix != null )
-						{
-							throw new Exception("Multiple keys for FileNamePrefix.");
-						}
-						if ( ! ( i + 1 < args.Length ) )
-						{
-							throw new Exception("Missing FileNamePrefix after corresponding key.");
-						}
-						FileNamePrefix = args[ i + 1 ];
-					}break;
+						case "/s":
+							{
+								if (ServerAddress != null)
+								{
+									throw new Exception("Multiple keys for ServerAddress.");
+								}
+								if (!(arg_index + 1 < args.Length))
+								{
+									throw new Exception("Missing ServerAddress after corresponding key.");
+								}
+								ServerAddress = args[arg_index + 1];
+							} break;
+						case "/d":
+							{
+								if (DatabaseName != null)
+								{
+									throw new Exception("Multiple keys for DatabaseName.");
+								}
+								if (!(arg_index + 1 < args.Length))
+								{
+									throw new Exception("Missing DatabaseName after corresponding key.");
+								}
+								DatabaseName = args[arg_index + 1];
+							} break;
+						case "/f":
+							{
+								if (FilenamePrefix != null)
+								{
+									throw new Exception("Multiple keys for FilenamePrefix.");
+								}
+								if (!(arg_index + 1 < args.Length))
+								{
+									throw new Exception("Missing FilenamePrefix after corresponding key.");
+								}
+								FilenamePrefix = args[arg_index + 1];
+							} break;
+					}
+				}
+
+				if (ServerAddress == null)
+				{
+					throw new Exception("ServerAddress undefined.");
+				}
+				if (DatabaseName == null)
+				{
+					throw new Exception("DatabaseName undefined.");
+				}
+				if (FilenamePrefix == null)
+				{
+					throw new Exception("FilenamePrefix undefined.");
+				}
+
+				Server Server_ = new Server(ServerAddress);
+				Server_.ConnectionContext.LoginSecure = true;
+				//Server_.ConnectionContext.Login = "sa";
+				//Server_.ConnectionContext.Password = "q";
+				//Server_.ConnectionContext.Connect();
+
+				Database Db = Server_.Databases[DatabaseName];
+
+				ScriptDefaults(Db, FilenamePrefix + " 00 Defaults.sql");
+				ScriptUddts(Db, FilenamePrefix + " 01 Uddts.sql");
+				ScriptUdtts(Db, FilenamePrefix + " 02 Udtts.sql");
+				ScriptTables(Db, FilenamePrefix + " 03 Tables.sql");
+				ScriptViews(Db, FilenamePrefix + " 04 Views.sql");
+				ScriptUdfs(Db, FilenamePrefix + " 05 Udfs.sql");
+				ScriptSps(Db, FilenamePrefix + " 06 Sps.sql");
+
+				/*
+				if (Server_.ConnectionContext.IsOpen)
+				{
+					Server_.ConnectionContext.Disconnect();
+				}
+				*/
+			}
+			catch (Exception ex)
+			{
+				Console.Write("Exception:\r\n" + ex.ToString() + "\r\n");
+			}
+		}
+
+		static void ScriptDefaults(Database Db, string Filename)
+		{
+			DefaultCollection Defaults = Db.Defaults;
+			Console.WriteLine("Scripting Defaults - Begin.");
+			Console.WriteLine("Scripting Defaults - Defaults.Count = " + Defaults.Count + ".");
+
+			ScriptingOptions so = new ScriptingOptions();
+			so.Add(ScriptOption.DriAll);
+			//so.Add(ScriptOption.Permissions);
+
+			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
+			{
+				File.WriteLine();
+				for (int i = 0; i < Defaults.Count; i++)
+				{
+					Default DbObj = Defaults[i];
+					StringCollection Script = DbObj.Script(so);
+					StreamWriter_Write_StringCollection(File, Script);
 				}
 			}
-
-			if ( ServerAddress == null )
-			{
-				throw new Exception("ServerAddress undefined.");
-			}
-			if ( DatabaseName == null )
-			{
-				throw new Exception("DatabaseName undefined.");
-			}
-			if ( FileNamePrefix == null )
-			{
-				throw new Exception("FileNamePrefix undefined.");
-			}
-
-
-			Server server = new Server(ServerAddress);
-			server.ConnectionContext.LoginSecure = true;
-			//server.ConnectionContext.Login = "sa";
-			//server.ConnectionContext.Password = "q";
-			server.ConnectionContext.Connect();
-
-			Database database = server.Databases[DatabaseName];
-
-
-			Console.Write("Scripting Defaults.");
-			ScriptDefaults(database, FileNamePrefix + " 00 Defaults.sql");
-			Console.Write(" Ok\n");
-
-			Console.Write("Scripting Data types.");
-			ScriptUDTs(database, FileNamePrefix + " 01 Data types.sql");
-			Console.Write(" Ok\n");
-
-			Console.Write("Scripting Functions.");
-			ScriptUDFs(database, FileNamePrefix + " 02 Functions.sql");
-			Console.Write(" Ok\n");
-
-			Console.Write("Scripting Views.");
-			ScriptViews(database, FileNamePrefix + " 03 Views.sql");
-			Console.Write(" Ok\n");
-
-			Console.Write("Scripting Tables.");
-			ScriptTables(database, FileNamePrefix + " 04 Tables.sql");
-			Console.Write(" Ok\n");
-
-			Console.Write("Scripting Stored procedures.");
-			ScriptSPs(database, FileNamePrefix + " 05 Stored procedures.sql");
-			Console.Write(" Ok\n");
-
-
-			if ( server.ConnectionContext.IsOpen )
-			{
-				server.ConnectionContext.Disconnect();
-			}
+			Console.WriteLine("Scripting Defaults - End.");
 		}
-		static void StartWrite(string FileName)
+
+		static void ScriptUddts(Database Db, string Filename)
+		{
+			UserDefinedDataTypeCollection Uddts = Db.UserDefinedDataTypes;
+			Console.WriteLine("Scripting Uddts - Begin.");
+			Console.WriteLine("Scripting Uddts - Uddts.Count = " + Uddts.Count + ".");
+
+			ScriptingOptions so = new ScriptingOptions();
+			so.Add(ScriptOption.DriAll);
+			//so.Add(ScriptOption.Permissions);
+
+			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
+			{
+				File.WriteLine();
+				for (int i = 0; i < Uddts.Count; i++)
+				{
+					UserDefinedDataType DbObj = Uddts[i];
+					StringCollection Script = DbObj.Script(so);
+					StreamWriter_Write_StringCollection(File, Script);
+				}
+			}
+			Console.WriteLine("Scripting Uddts - End.");
+		}
+
+		static void ScriptUdtts(Database Db, string Filename)
+		{
+			UserDefinedTableTypeCollection Udtts = Db.UserDefinedTableTypes;
+			Console.WriteLine("Scripting Udtts - Begin.");
+			Console.WriteLine("Scripting Udtts - Udtts.Count = " + Udtts.Count + ".");
+
+			ScriptingOptions so = new ScriptingOptions();
+			so.Add(ScriptOption.DriAll);
+			//so.Add(ScriptOption.Permissions);
+
+			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
+			{
+				File.WriteLine();
+				for (int i = 0; i < Udtts.Count; i++)
+				{
+					UserDefinedTableType DbObj = Udtts[i];
+					StringCollection Script = DbObj.Script(so);
+					StreamWriter_Write_StringCollection(File, Script);
+				}
+			}
+			Console.WriteLine("Scripting Udtts - End.");
+		}
+
+		static void ScriptTables(Database Db, string Filename)
+		{
+			TableCollection Tables = Db.Tables;
+			Console.WriteLine("Scripting Tables - Begin.");
+			Console.WriteLine("Scripting Tables - Tables.Count = " + Tables.Count + ".");
+
+			ScriptingOptions so = new ScriptingOptions();
+			so.Add(ScriptOption.DriAll);
+			//so.Add(ScriptOption.Permissions);
+			so.Add(ScriptOption.Triggers);
+			so.Add(ScriptOption.Bindings);
+			so.Add(ScriptOption.ClusteredIndexes);
+			//so.Add(ScriptOption.WithDependencies);
+			so.Add(ScriptOption.ExtendedProperties);
+
+			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
+			{
+				File.WriteLine();
+				for (int i = 0; i < Tables.Count; i++)
+				{
+					Table DbObj = Tables[i];
+					if (DbObj.IsSystemObject)
+					{
+						//Console.WriteLine("Table \"" + DbObj.Name + "\" IsSystemObject.");
+						continue;
+					}
+					StringCollection Script = DbObj.Script(so);
+					StreamWriter_Write_StringCollection(File, Script);
+				}
+			}
+			Console.WriteLine("Scripting Tables - End.");
+		}
+
+		static void ScriptViews(Database Db, string Filename)
+		{
+			ViewCollection Views = Db.Views;
+			Console.WriteLine("Scripting Views - Begin.");
+			Console.WriteLine("Scripting Views - Views.Count = " + Views.Count + ".");
+
+			ScriptingOptions so = new ScriptingOptions();
+			so.Add(ScriptOption.DriAll);
+			//so.Add(ScriptOption.Permissions);
+
+			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
+			{
+				File.WriteLine();
+				for (int i = 0; i < Views.Count; i++)
+				{
+					View DbObj = Views[i];
+					if (DbObj.IsSystemObject)
+					{
+						//Console.WriteLine("View \"" + DbObj.Name + "\" IsSystemObject.");
+						continue;
+					}
+					StringCollection Script = DbObj.Script(so);
+					StreamWriter_Write_StringCollection(File, Script);
+				}
+			}
+			Console.WriteLine("Scripting Views - End.");
+		}
+
+		static void ScriptUdfs(Database Db, string Filename)
+		{
+			UserDefinedFunctionCollection Udfs = Db.UserDefinedFunctions;
+			Console.WriteLine("Scripting Udfs - Begin.");
+			Console.WriteLine("Scripting Udfs - Udfs.Count = " + Udfs.Count + ".");
+
+			ScriptingOptions so = new ScriptingOptions();
+			so.Add(ScriptOption.DriAll);
+			//so.Add(ScriptOption.Permissions);
+
+			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
+			{
+				File.WriteLine();
+				for (int i = 0; i < Udfs.Count; i++)
+				{
+					UserDefinedFunction DbObj = Udfs[i];
+					if (DbObj.IsSystemObject)
+					{
+						//Console.WriteLine("Udf \"" + DbObj.Name + "\" IsSystemObject.");
+						continue;
+					}
+					StringCollection Script = DbObj.Script(so);
+					StreamWriter_Write_StringCollection(File, Script);
+				}
+			}
+			Console.WriteLine("Scripting Udfs - End.");
+		}
+
+		static void ScriptSps(Database Db, string Filename)
+		{
+			StoredProcedureCollection Sps = Db.StoredProcedures;
+			Console.WriteLine("Scripting Sps - Begin.");
+			Console.WriteLine("Scripting Sps - Sps.Count = " + Sps.Count + ".");
+
+			ScriptingOptions so = new ScriptingOptions();
+			so.Add(ScriptOption.DriAll);
+			//so.Add(ScriptOption.Permissions);
+			//so.Add(ScriptOption.IncludeIfNotExists);
+
+			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
+			{
+				File.WriteLine();
+				for (int i = 0; i < Sps.Count; i++)
+				{
+					StoredProcedure DbObj = Sps[i];
+					if (DbObj.IsSystemObject)
+					{
+						//Console.WriteLine("Sp \"" + DbObj.Name + "\" IsSystemObject.");
+						continue;
+					}
+					StringCollection Script = DbObj.Script(so);
+
+					/*
+					if (!(Script.Count == 3 || Script.Count == 4))
+					{
+						throw new Exception("Stored Procedure has incorrect format. Expected count of blocks is 3 or 4.");
+					}
+					Script.Remove("SET ANSI_NULLS ON");
+					Script.Remove("SET ANSI_NULLS OFF");
+					Script.Remove("SET QUOTED_IDENTIFIER ON");
+					Script.Remove("SET QUOTED_IDENTIFIER OFF");
+					if (Script.Count == 2)
+					{
+						if (Script[1].Substring(0, 13) == "GRANT EXECUTE")
+						{
+							Script.RemoveAt(1);
+						}
+						else
+						{
+							throw new Exception("Stored Procedure has incorrect format. \"GRANT EXECUTE\" statement expected.");
+						}
+					}
+					else if (Script.Count != 1)
+					{
+						throw new Exception("Stored Procedure has incorrect format. \"SET ANSI_NULLS\" or \"SET QUOTED_IDENTIFIER\" statement expected.");
+					}
+					*/
+
+					StreamWriter_Write_StringCollection(File, Script);
+				}
+			}
+			Console.WriteLine("Scripting Sps - End.");
+		}
+
+		/*
+		static void StartWrite(string Filename)
 		{
 			Start = DateTime.UtcNow;
-			StreamWriter sw = new StreamWriter(FileName, false, Encoding.Unicode);
+			StreamWriter sw = new StreamWriter(Filename, false, Encoding.Unicode);
 			sw.Close();
 		}
-		static void WriteToFile(string FileName, StringCollection StringBlocks)
+
+		static void WriteToFile(string Filename, StringCollection StringBlocks)
 		{
-			StreamWriter sw = new StreamWriter(FileName, true, Encoding.Unicode);
+			StreamWriter sw = new StreamWriter(Filename, true, Encoding.Unicode);
 			foreach (string block in StringBlocks)
 			{
 				sw.WriteLine(block);
@@ -135,133 +343,15 @@ namespace DBScripter
 			sw.Close();
 		}
 
-		static void ScriptSPs(Database database, string fileName)
+		*/
+
+		static void StreamWriter_Write_StringCollection(StreamWriter sw, StringCollection sc)
 		{
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			so.Add(ScriptOption.Permissions);
-			so.Add(ScriptOption.IncludeIfNotExists);
-			
-			StartWrite(fileName);
-			foreach (StoredProcedure smo in database.StoredProcedures)
+			foreach (string s in sc)
 			{
-				if (smo.IsSystemObject == false)
-				{
-					StringCollection sc = smo.Script(so);
-					
-					if(sc.Count == 3 || sc.Count == 4)
-					{
-						sc.Remove("SET ANSI_NULLS ON");
-						sc.Remove("SET ANSI_NULLS OFF");
-						sc.Remove("SET QUOTED_IDENTIFIER ON");
-						sc.Remove("SET QUOTED_IDENTIFIER OFF");
-						if(sc.Count == 2)
-						{
-							if(sc[1].Substring(0, 13) == "GRANT EXECUTE")
-							{
-								sc.RemoveAt(1);
-							}
-							else
-							{
-								throw new Exception("Stored Procedure has incorrect format.\"GRANT EXECUTE\" statement expected.");
-							}
-						}
-						else if(sc.Count != 1)
-						{
-							throw new Exception("Stored Procedure has incorrect format.\"SET ANSI_NULLS\" or \"SET QUOTED_IDENTIFIER\" statement expected");
-						}
-					}
-					else
-					{
-						throw new Exception("Stored Procedure has incorrect format. Expected count of blocks is 3 or 4.");
-					}
-					WriteToFile(fileName, sc);
-				}
+				sw.WriteLine(s);
 			}
-		}
-
-		static void ScriptTables(Database database, string fileName)
-		{
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			so.Add(ScriptOption.Permissions);
-			so.Add(ScriptOption.Triggers);
-			so.Add(ScriptOption.Bindings);
-			so.Add(ScriptOption.ClusteredIndexes);
-			//so.Add(ScriptOption.WithDependencies);
-			so.Add(ScriptOption.ExtendedProperties);
-
-			StartWrite(fileName);
-			foreach (Table smo in database.Tables)
-			{
-				if (smo.IsSystemObject == false)
-				{
-					StringCollection sc = smo.Script(so);
-					WriteToFile(fileName, sc);
-				}
-			}
-		}
-
-		static void ScriptUDFs(Database database, string fileName)
-		{
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			so.Add(ScriptOption.Permissions);
-			
-			StartWrite(fileName);
-			foreach (UserDefinedFunction smo in database.UserDefinedFunctions)
-			{
-				if (smo.IsSystemObject == false)
-				{
-					StringCollection sc = smo.Script(so);
-					WriteToFile(fileName, sc);
-				}
-			}
-		}
-
-		static void ScriptViews(Database database, string fileName)
-		{
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			so.Add(ScriptOption.Permissions);
-
-			StartWrite(fileName);
-			foreach (View smo in database.Views)
-			{
-				if (smo.IsSystemObject == false)
-				{
-					StringCollection sc = smo.Script(so);
-					WriteToFile(fileName, sc);
-				}
-			}
-		}
-
-		static void ScriptUDTs(Database database, string fileName)
-		{
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			so.Add(ScriptOption.Permissions);
-
-			StartWrite(fileName);
-			foreach (UserDefinedDataType smo in database.UserDefinedDataTypes)
-			{
-				StringCollection sc = smo.Script(so);
-				WriteToFile(fileName, sc);
-			}
-		}
-
-		static void ScriptDefaults(Database database, string fileName)
-		{
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			so.Add(ScriptOption.Permissions);
-
-			StartWrite(fileName);
-			foreach (Default smo in database.Defaults)
-			{
-				StringCollection sc = smo.Script(so);
-				WriteToFile(fileName, sc);
-			}
+			sw.WriteLine();
 		}
 
 	}

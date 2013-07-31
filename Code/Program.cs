@@ -202,10 +202,10 @@ namespace DbScripter
 				throw new Exception("File \"" + Filename + "\" already exists.");
 			}
 
-			TableCollection Tables = Db.Tables;
+			TableCollection DbObjs = Db.Tables;
 			DateTime TimeBegin = DateTime.UtcNow;
 			Console.WriteLine("Scripting Tables - Begin.");
-			Console.WriteLine("Scripting Tables - Tables.Count = " + Tables.Count + ".");
+			Console.WriteLine("Scripting Tables - DbObjs.Count = " + DbObjs.Count + ".");
 
 			ScriptingOptions so = new ScriptingOptions();
 			so.Add(ScriptOption.DriAll);
@@ -219,9 +219,9 @@ namespace DbScripter
 			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
 			{
 				File.WriteLine();
-				for (int i = 0; i < Tables.Count; i++)
+				for (int i = 0; i < DbObjs.Count; i++)
 				{
-					Table DbObj = Tables[i];
+					Table DbObj = DbObjs[i];
 					if (DbObj.IsSystemObject)
 					{
 						continue;

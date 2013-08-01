@@ -93,18 +93,21 @@ namespace DbScripter
 				{
 					Defaults_list.Add(Defaults[i]);
 				}
+
 				List<object> Uddts_list = new List<object>();
 				UserDefinedDataTypeCollection Uddts = Db.UserDefinedDataTypes;
 				for (int i = 0; i < Uddts.Count; i++)
 				{
 					Uddts_list.Add(Uddts[i]);
 				}
+
 				List<object> Udtts_list = new List<object>();
 				UserDefinedTableTypeCollection Udtts = Db.UserDefinedTableTypes;
 				for (int i = 0; i < Udtts.Count; i++)
 				{
 					Udtts_list.Add(Udtts[i]);
 				}
+
 				//
 				List<object> Tables_list = new List<object>();
 				TableCollection Tables = Db.Tables;
@@ -115,6 +118,7 @@ namespace DbScripter
 						Tables_list.Add(Tables[i]);
 					}
 				}
+
 				List<object> Views_list = new List<object>();
 				ViewCollection Views = Db.Views;
 				for (int i = 0; i < Views.Count; i++)
@@ -124,6 +128,7 @@ namespace DbScripter
 						Views_list.Add(Views[i]);
 					}
 				}
+
 				//
 				List<object> Udfs_list = new List<object>();
 				UserDefinedFunctionCollection Udfs = Db.UserDefinedFunctions;
@@ -134,6 +139,7 @@ namespace DbScripter
 						Udfs_list.Add(Udfs[i]);
 					}
 				}
+
 				List<object> Sps_list = new List<object>();
 				StoredProcedureCollection Sps = Db.StoredProcedures;
 				for (int i = 0; i < Sps.Count; i++)

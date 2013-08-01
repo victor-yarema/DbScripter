@@ -76,12 +76,12 @@ namespace DbScripter
 					throw new Exception("FilenamePrefix undefined.");
 				}
 
-				Server Server_ = new Server(ServerAddress);
-				Server_.ConnectionContext.LoginSecure = true;
-				//Server_.ConnectionContext.Login = "sa";
-				//Server_.ConnectionContext.Password = "q";
+				Server Srv = new Server(ServerAddress);
+				Srv.ConnectionContext.LoginSecure = true;
+				//Srv.ConnectionContext.Login = "sa";
+				//Srv.ConnectionContext.Password = "q";
 
-				Database Db = Server_.Databases[DatabaseName];
+				Database Db = Srv.Databases[DatabaseName];
 
 
 				DateTime TimeBegin = DateTime.UtcNow;

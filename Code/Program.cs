@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Text;
 using Microsoft.SqlServer.Management.Smo;
+using MsSqlSmo;
 using Time;
 
 
@@ -82,13 +83,84 @@ namespace DbScripter
 
 				Database Db = Server_.Databases[DatabaseName];
 
-				ScriptDefaults(Db, FilenamePrefix + " 00 Defaults.sql");
-				ScriptUddts(Db, FilenamePrefix + " 01 Uddts.sql");
-				ScriptUdtts(Db, FilenamePrefix + " 02 Udtts.sql");
-				ScriptTables(Db, FilenamePrefix + " 03 Tables.sql");
-				ScriptViews(Db, FilenamePrefix + " 04 Views.sql");
-				ScriptUdfs(Db, FilenamePrefix + " 05 Udfs.sql");
-				ScriptSps(Db, FilenamePrefix + " 06 Sps.sql");
+
+				DateTime TimeBegin = DateTime.UtcNow;
+				Console.WriteLine("Init - Begin.");
+
+				List<object> Defaults_list = new List<object>();
+				DefaultCollection Defaults = Db.Defaults;
+				for (int i = 0; i < Defaults.Count; i++)
+				{
+					Defaults_list.Add(Defaults[i]);
+				}
+				List<object> Uddts_list = new List<object>();
+				UserDefinedDataTypeCollection Uddts = Db.UserDefinedDataTypes;
+				for (int i = 0; i < Uddts.Count; i++)
+				{
+					Uddts_list.Add(Uddts[i]);
+				}
+				List<object> Udtts_list = new List<object>();
+				UserDefinedTableTypeCollection Udtts = Db.UserDefinedTableTypes;
+				for (int i = 0; i < Udtts.Count; i++)
+				{
+					Udtts_list.Add(Udtts[i]);
+				}
+				//
+				List<object> Tables_list = new List<object>();
+				TableCollection Tables = Db.Tables;
+				for (int i = 0; i < Tables.Count; i++)
+				{
+					if (!Tables[i].IsSystemObject)
+					{
+						Tables_list.Add(Tables[i]);
+					}
+				}
+				List<object> Views_list = new List<object>();
+				ViewCollection Views = Db.Views;
+				for (int i = 0; i < Views.Count; i++)
+				{
+					if (!Views[i].IsSystemObject)
+					{
+						Views_list.Add(Views[i]);
+					}
+				}
+				//
+				List<object> Udfs_list = new List<object>();
+				UserDefinedFunctionCollection Udfs = Db.UserDefinedFunctions;
+				for (int i = 0; i < Udfs.Count; i++)
+				{
+					if (!Udfs[i].IsSystemObject)
+					{
+						Udfs_list.Add(Udfs[i]);
+					}
+				}
+				List<object> Sps_list = new List<object>();
+				StoredProcedureCollection Sps = Db.StoredProcedures;
+				for (int i = 0; i < Sps.Count; i++)
+				{
+					if (!Sps[i].IsSystemObject)
+					{
+						Sps_list.Add(Sps[i]);
+					}
+				}
+
+				string InitTimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+				Console.WriteLine("Init - End. TimeInterval = " + InitTimeInterval + " .");
+
+
+				Script(Defaults_list.ToArray(), ObjectType.Default, FilenamePrefix + " 00 Defaults.sql");
+				Script(Uddts_list.ToArray(), ObjectType.Uddt, FilenamePrefix + " 01 Uddts.sql");
+				Script(Udtts_list.ToArray(), ObjectType.Udtt, FilenamePrefix + " 02 Udtts.sql");
+				//
+				Script(Tables_list.ToArray(), ObjectType.Table, FilenamePrefix + " 03 Tables.sql");
+				Script(Views_list.ToArray(), ObjectType.View, FilenamePrefix + " 04 Views.sql");
+				//
+				Script(Udfs_list.ToArray(), ObjectType.Udf, FilenamePrefix + " 05 Udfs.sql");
+				Script(Sps_list.ToArray(), ObjectType.Sp, FilenamePrefix + " 06 Sps.sql");
+
+				Console.WriteLine();
+				string TotalTimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+				Console.WriteLine("TotalTimeInterval = " + TotalTimeInterval + " .");
 			}
 			catch (Exception ex)
 			{
@@ -96,285 +168,226 @@ namespace DbScripter
 			}
 		}
 
-		static void ScriptDefaults(Database Db, string Filename)
+		static void Script(object[] Objs, ObjectType Type, string Filename)
 		{
 			if (System.IO.File.Exists(Filename))
 			{
 				throw new Exception("File \"" + Filename + "\" already exists.");
 			}
 
-			DefaultCollection DbObjs = Db.Defaults;
 			DateTime TimeBegin = DateTime.UtcNow;
-			Console.WriteLine("Scripting Defaults - Begin.");
-			Console.WriteLine("Scripting Defaults - DbObjs.Count = " + DbObjs.Count + ".");
-
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			//so.Add(ScriptOption.Permissions);
-
-			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
-			{
-				File.WriteLine();
-				for (int i = 0; i < DbObjs.Count; i++)
-				{
-					Default DbObj = DbObjs[i];
-					File.WriteLine();
-					File.WriteLine();
-					StringCollection Script = DbObj.Script(so);
-					StreamWriter_Write_StringCollection(File, Script);
-					File.WriteLine();
-				}
-			}
-			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
-			Console.WriteLine("Scripting Defaults - End. TimeInterval = " + TimeInterval + " .");
-		}
-
-		static void ScriptUddts(Database Db, string Filename)
-		{
-			if (System.IO.File.Exists(Filename))
-			{
-				throw new Exception("File \"" + Filename + "\" already exists.");
-			}
-
-			UserDefinedDataTypeCollection DbObjs = Db.UserDefinedDataTypes;
-			DateTime TimeBegin = DateTime.UtcNow;
-			Console.WriteLine("Scripting Uddts - Begin.");
-			Console.WriteLine("Scripting Uddts - DbObjs.Count = " + DbObjs.Count + ".");
-
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			//so.Add(ScriptOption.Permissions);
-
-			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
-			{
-				File.WriteLine();
-				for (int i = 0; i < DbObjs.Count; i++)
-				{
-					UserDefinedDataType DbObj = DbObjs[i];
-					File.WriteLine();
-					File.WriteLine();
-					StringCollection Script = DbObj.Script(so);
-					StreamWriter_Write_StringCollection(File, Script);
-					File.WriteLine();
-				}
-			}
-			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
-			Console.WriteLine("Scripting Uddts - End. TimeInterval = " + TimeInterval + " .");
-		}
-
-		static void ScriptUdtts(Database Db, string Filename)
-		{
-			if (System.IO.File.Exists(Filename))
-			{
-				throw new Exception("File \"" + Filename + "\" already exists.");
-			}
-
-			UserDefinedTableTypeCollection DbObjs = Db.UserDefinedTableTypes;
-			DateTime TimeBegin = DateTime.UtcNow;
-			Console.WriteLine("Scripting Udtts - Begin.");
-			Console.WriteLine("Scripting Udtts - DbObjs.Count = " + DbObjs.Count + ".");
-
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			//so.Add(ScriptOption.Permissions);
-
-			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
-			{
-				File.WriteLine();
-				for (int i = 0; i < DbObjs.Count; i++)
-				{
-					UserDefinedTableType DbObj = DbObjs[i];
-					File.WriteLine();
-					File.WriteLine();
-					StringCollection Script = DbObj.Script(so);
-					StreamWriter_Write_StringCollection(File, Script);
-					File.WriteLine();
-				}
-			}
-			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
-			Console.WriteLine("Scripting Udtts - End. TimeInterval = " + TimeInterval + " .");
-		}
-
-		static void ScriptTables(Database Db, string Filename)
-		{
-			if (System.IO.File.Exists(Filename))
-			{
-				throw new Exception("File \"" + Filename + "\" already exists.");
-			}
-
-			TableCollection DbObjs = Db.Tables;
-			DateTime TimeBegin = DateTime.UtcNow;
-			Console.WriteLine("Scripting Tables - Begin.");
-			Console.WriteLine("Scripting Tables - DbObjs.Count = " + DbObjs.Count + ".");
-
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			//so.Add(ScriptOption.Permissions);
-			so.Add(ScriptOption.Triggers);
-			so.Add(ScriptOption.Bindings);
-			so.Add(ScriptOption.ClusteredIndexes);
-			//so.Add(ScriptOption.WithDependencies);
-			so.Add(ScriptOption.ExtendedProperties);
-
-			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
-			{
-				File.WriteLine();
-				for (int i = 0; i < DbObjs.Count; i++)
-				{
-					Table DbObj = DbObjs[i];
-					if (DbObj.IsSystemObject)
-					{
-						continue;
-					}
-					File.WriteLine();
-					File.WriteLine();
-					StringCollection Script = DbObj.Script(so);
-					StreamWriter_Write_StringCollection(File, Script);
-					File.WriteLine();
-				}
-			}
-			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
-			Console.WriteLine("Scripting Tables - End. TimeInterval = " + TimeInterval + " .");
-		}
-
-		static void ScriptViews(Database Db, string Filename)
-		{
-			if (System.IO.File.Exists(Filename))
-			{
-				throw new Exception("File \"" + Filename + "\" already exists.");
-			}
-
-			ViewCollection DbObjs = Db.Views;
-			DateTime TimeBegin = DateTime.UtcNow;
-			Console.WriteLine("Scripting Views - Begin.");
-			Console.WriteLine("Scripting Views - DbObjs.Count = " + DbObjs.Count + ".");
-
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			//so.Add(ScriptOption.Permissions);
-
-			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
-			{
-				File.WriteLine();
-				for (int i = 0; i < DbObjs.Count; i++)
-				{
-					View DbObj = DbObjs[i];
-					if (DbObj.IsSystemObject)
-					{
-						continue;
-					}
-					File.WriteLine();
-					File.WriteLine();
-					StringCollection Script = DbObj.Script(so);
-					StreamWriter_Write_StringCollection(File, Script);
-					File.WriteLine();
-				}
-			}
-			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
-			Console.WriteLine("Scripting Views - End. TimeInterval = " + TimeInterval + " .");
-		}
-
-		static void ScriptUdfs(Database Db, string Filename)
-		{
-			if (System.IO.File.Exists(Filename))
-			{
-				throw new Exception("File \"" + Filename + "\" already exists.");
-			}
-
-			UserDefinedFunctionCollection DbObjs = Db.UserDefinedFunctions;
-			DateTime TimeBegin = DateTime.UtcNow;
-			Console.WriteLine("Scripting Udfs - Begin.");
-			Console.WriteLine("Scripting Udfs - DbObjs.Count = " + DbObjs.Count + ".");
-
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			//so.Add(ScriptOption.Permissions);
-
-			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
-			{
-				File.WriteLine();
-				for (int i = 0; i < DbObjs.Count; i++)
-				{
-					UserDefinedFunction DbObj = DbObjs[i];
-					if (DbObj.IsSystemObject)
-					{
-						continue;
-					}
-					File.WriteLine();
-					File.WriteLine();
-					StringCollection Script = DbObj.Script(so);
-					StreamWriter_Write_StringCollection(File, Script);
-					File.WriteLine();
-				}
-			}
-			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
-			Console.WriteLine("Scripting Udfs - End. TimeInterval = " + TimeInterval + " .");
-		}
-
-		static void ScriptSps(Database Db, string Filename)
-		{
-			if (System.IO.File.Exists(Filename))
-			{
-				throw new Exception("File \"" + Filename + "\" already exists.");
-			}
-
-			StoredProcedureCollection DbObjs = Db.StoredProcedures;
-			DateTime TimeBegin = DateTime.UtcNow;
-			Console.WriteLine("Scripting Sps - Begin.");
-			Console.WriteLine("Scripting Sps - DbObjs.Count = " + DbObjs.Count + ".");
+			Console.WriteLine(Type.ToString() + "s - Begin.");
+			Console.WriteLine(Type.ToString() + "s - Objs.Length = " + Objs.Length + ".");
 
 			ScriptingOptions so = new ScriptingOptions();
 			so.Add(ScriptOption.DriAll);
 			//so.Add(ScriptOption.Permissions);
 			//so.Add(ScriptOption.IncludeIfNotExists);
+			if (Type == ObjectType.Table)
+			{
+				so.Add(ScriptOption.Triggers);
+				so.Add(ScriptOption.Bindings);
+				so.Add(ScriptOption.ClusteredIndexes);
+				//so.Add(ScriptOption.WithDependencies);
+				so.Add(ScriptOption.ExtendedProperties);
+			}
 
 			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
 			{
 				File.WriteLine();
-				for (int i = 0; i < DbObjs.Count; i++)
-				{
-					StoredProcedure DbObj = DbObjs[i];
-					if (DbObj.IsSystemObject)
-					{
-						continue;
-					}
-					File.WriteLine();
-					File.WriteLine();
-					StringCollection Script = DbObj.Script(so);
 
-					/*
-					if (!(Script.Count == 3 || Script.Count == 4))
+				int ScriptMaxLen_Default = 0;
+				int ScriptMaxLen_Uddt = 0;
+				int ScriptMaxLen_Udtt = 0;
+				//
+				int ScriptMaxLen_Table = 0;
+				int ScriptMaxLen_View = 0;
+				//
+				int ScriptMaxLen_Udf = 0;
+				int ScriptMaxLen_Sp = 0;
+
+				for (int i = 0; i < Objs.Length; i++)
+				{
+					StringCollection Script;
+					switch (Type)
 					{
-						throw new Exception("Stored Procedure has incorrect format. Expected count of blocks is 3 or 4.");
+						case ObjectType.Default:
+							{
+								Default DbObj = (Default)Objs[i];
+								Script = DbObj.Script(so);
+								if (ScriptMaxLen_Default < Script.Count)
+								{
+									ScriptMaxLen_Default = Script.Count;
+								}
+							} break;
+						case ObjectType.Uddt:
+							{
+								UserDefinedDataType DbObj = (UserDefinedDataType)Objs[i];
+								Script = DbObj.Script(so);
+								if (ScriptMaxLen_Uddt < Script.Count)
+								{
+									ScriptMaxLen_Uddt = Script.Count;
+								}
+							} break;
+						case ObjectType.Udtt:
+							{
+								UserDefinedTableType DbObj = (UserDefinedTableType)Objs[i];
+								Script = DbObj.Script(so);
+								if (ScriptMaxLen_Udtt < Script.Count)
+								{
+									ScriptMaxLen_Udtt = Script.Count;
+								}
+							} break;
+						case ObjectType.Table:
+							{
+								Table DbObj = (Table)Objs[i];
+								Script = DbObj.Script(so);
+
+								if (Script[0] != SET_ANSI_NULLS_ON)
+								{
+									throw new Exception("Invalid format.");
+								}
+								Script.RemoveAt(0);
+								if (Script[0] != SET_QUOTED_IDENTIFIER_ON)
+								{
+									throw new Exception("Invalid format.");
+								}
+								Script.RemoveAt(0);
+
+								if (Script[0].Substring(0, CREATE_TABLE.Length) != CREATE_TABLE)
+								{
+									throw new Exception("Invalid format.");
+								}
+
+								for (int j = Script.Count - 1; j >= 2; j--)
+								{
+									if (Script[j].IndexOf(CHECK_CONSTRAINT) != -1)
+									{
+										Script.RemoveAt(j);
+									}
+								}
+								for (int j = 0; j < Script.Count; j++)
+								{
+									if (Script[j].IndexOf(ALTER_TABLE) == 0 && Script[j].IndexOf(FOREIGN_KEY_) > 0)
+									{
+										Script[j] = Script[j].Replace(" " + FOREIGN_KEY, "\r\n" + FOREIGN_KEY + " ");
+										Script[j] = Script[j].Replace("\r\n", "\r\n\t");
+									}
+								}
+
+								if (ScriptMaxLen_Table < Script.Count)
+								{
+									ScriptMaxLen_Table = Script.Count;
+								}
+
+								if (Script.Count >= 16)
+								{
+									Console.WriteLine("Table \"" + DbObj.Name + "\" Script.Count = " + Script.Count + ".");
+								}
+
+								if (DbObj.DataSpaceUsed > 128 * 1000)
+								{
+									Console.WriteLine("Table \"" + DbObj.Name + "\" data size = " + DbObj.DataSpaceUsed / 1000 + " MB.");
+								}
+							} break;
+						case ObjectType.View:
+							{
+								View DbObj = (View)Objs[i];
+								Script = DbObj.Script(so);
+								if (ScriptMaxLen_View < Script.Count)
+								{
+									ScriptMaxLen_View = Script.Count;
+								}
+							} break;
+						case ObjectType.Udf:
+							{
+								UserDefinedFunction DbObj = (UserDefinedFunction)Objs[i];
+								Script = DbObj.Script(so);
+								if (ScriptMaxLen_Udf < Script.Count)
+								{
+									ScriptMaxLen_Udf = Script.Count;
+								}
+							} break;
+						case ObjectType.Sp:
+							{
+								StoredProcedure DbObj = (StoredProcedure)Objs[i];
+								Script = DbObj.Script(so);
+
+								if (Script[0] != SET_ANSI_NULLS_ON)
+								{
+									throw new Exception("Invalid format.");
+								}
+								Script.RemoveAt(0);
+								if (Script[0] != SET_QUOTED_IDENTIFIER_ON)
+								{
+									throw new Exception("Invalid format.");
+								}
+								Script.RemoveAt(0);
+
+								if (ScriptMaxLen_Sp < Script.Count)
+								{
+									ScriptMaxLen_Sp = Script.Count;
+								}
+							} break;
+						default:
+							throw new Exception("Unknown Type = \"" + Type.ToString() + "\".");
 					}
-					Script.Remove("SET ANSI_NULLS ON");
-					Script.Remove("SET ANSI_NULLS OFF");
-					Script.Remove("SET QUOTED_IDENTIFIER ON");
-					Script.Remove("SET QUOTED_IDENTIFIER OFF");
-					if (Script.Count == 2)
-					{
-						if (Script[1].Substring(0, 13) == "GRANT EXECUTE")
-						{
-							Script.RemoveAt(1);
-						}
-						else
-						{
-							throw new Exception("Stored Procedure has incorrect format. \"GRANT EXECUTE\" statement expected.");
-						}
-					}
-					else if (Script.Count != 1)
-					{
-						throw new Exception("Stored Procedure has incorrect format. \"SET ANSI_NULLS\" or \"SET QUOTED_IDENTIFIER\" statement expected.");
-					}
-					*/
 
 					StreamWriter_Write_StringCollection(File, Script);
 					File.WriteLine();
+					File.WriteLine();
+					File.WriteLine();
+					File.WriteLine();
 				}
+
+				switch (Type)
+				{
+					case ObjectType.Default:
+						{
+							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Default + ".");
+						} break;
+					case ObjectType.Uddt:
+						{
+							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Uddt + ".");
+						} break;
+					case ObjectType.Udtt:
+						{
+							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Udtt + ".");
+						} break;
+					//
+					case ObjectType.Table:
+						{
+							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Table + ".");
+						} break;
+					case ObjectType.View:
+						{
+							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_View + ".");
+						} break;
+					//
+					case ObjectType.Udf:
+						{
+							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Udf + ".");
+						} break;
+					case ObjectType.Sp:
+						{
+							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Sp + ".");
+						} break;
+					default:
+						throw new Exception("Unknown Type = \"" + Type.ToString() + "\".");
+				}
+
 			}
 			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
-			Console.WriteLine("Scripting Sps - End. TimeInterval = " + TimeInterval + " .");
+			Console.WriteLine(Type.ToString() + "s - End. TimeInterval = " + TimeInterval + " .");
 		}
+
+		const string SET_ANSI_NULLS_ON = "SET ANSI_NULLS ON";
+		const string SET_QUOTED_IDENTIFIER_ON = "SET QUOTED_IDENTIFIER ON";
+		const string CREATE_TABLE = "CREATE TABLE";
+		const string CHECK_CONSTRAINT = "CHECK CONSTRAINT";
+		const string ALTER_TABLE = "ALTER TABLE";
+		const string FOREIGN_KEY = "FOREIGN KEY";
+		const string FOREIGN_KEY_ = FOREIGN_KEY + "(";
 
 		static void StreamWriter_Write_StringCollection(StreamWriter sw, StringCollection sc)
 		{

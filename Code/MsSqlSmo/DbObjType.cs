@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MsSqlSmo
 {
-	enum ObjectType
+	enum DbObjType
 	{
 		Default,
 		Uddt,

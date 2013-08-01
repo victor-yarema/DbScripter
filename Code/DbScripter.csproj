@@ -87,7 +87,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MsSqlSmo\ObjectType.cs" />
+    <Compile Include="MsSqlSmo\DbObjType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Time\TimeUtilities.cs" />

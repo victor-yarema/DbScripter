@@ -148,15 +148,15 @@ namespace DbScripter
 				Console.WriteLine("Init - End. TimeInterval = " + InitTimeInterval + " .");
 
 
-				Script(Defaults_list.ToArray(), ObjectType.Default, FilenamePrefix + " 00 Defaults.sql");
-				Script(Uddts_list.ToArray(), ObjectType.Uddt, FilenamePrefix + " 01 Uddts.sql");
-				Script(Udtts_list.ToArray(), ObjectType.Udtt, FilenamePrefix + " 02 Udtts.sql");
+				Script(Defaults_list.ToArray(), DbObjType.Default, FilenamePrefix + " 00 Defaults.sql");
+				Script(Uddts_list.ToArray(), DbObjType.Uddt, FilenamePrefix + " 01 Uddts.sql");
+				Script(Udtts_list.ToArray(), DbObjType.Udtt, FilenamePrefix + " 02 Udtts.sql");
 				//
-				Script(Tables_list.ToArray(), ObjectType.Table, FilenamePrefix + " 03 Tables.sql");
-				Script(Views_list.ToArray(), ObjectType.View, FilenamePrefix + " 04 Views.sql");
+				Script(Tables_list.ToArray(), DbObjType.Table, FilenamePrefix + " 03 Tables.sql");
+				Script(Views_list.ToArray(), DbObjType.View, FilenamePrefix + " 04 Views.sql");
 				//
-				Script(Udfs_list.ToArray(), ObjectType.Udf, FilenamePrefix + " 05 Udfs.sql");
-				Script(Sps_list.ToArray(), ObjectType.Sp, FilenamePrefix + " 06 Sps.sql");
+				Script(Udfs_list.ToArray(), DbObjType.Udf, FilenamePrefix + " 05 Udfs.sql");
+				Script(Sps_list.ToArray(), DbObjType.Sp, FilenamePrefix + " 06 Sps.sql");
 
 				Console.WriteLine();
 				string TotalTimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
@@ -168,7 +168,7 @@ namespace DbScripter
 			}
 		}
 
-		static void Script(object[] Objs, ObjectType Type, string Filename)
+		static void Script(object[] Objs, DbObjType Type, string Filename)
 		{
 			if (System.IO.File.Exists(Filename))
 			{
@@ -183,7 +183,7 @@ namespace DbScripter
 			so.Add(ScriptOption.DriAll);
 			//so.Add(ScriptOption.Permissions);
 			//so.Add(ScriptOption.IncludeIfNotExists);
-			if (Type == ObjectType.Table)
+			if (Type == DbObjType.Table)
 			{
 				so.Add(ScriptOption.Triggers);
 				so.Add(ScriptOption.Bindings);
@@ -211,7 +211,7 @@ namespace DbScripter
 					StringCollection Script;
 					switch (Type)
 					{
-						case ObjectType.Default:
+						case DbObjType.Default:
 							{
 								Default DbObj = (Default)Objs[i];
 								Script = DbObj.Script(so);
@@ -220,7 +220,7 @@ namespace DbScripter
 									ScriptMaxLen_Default = Script.Count;
 								}
 							} break;
-						case ObjectType.Uddt:
+						case DbObjType.Uddt:
 							{
 								UserDefinedDataType DbObj = (UserDefinedDataType)Objs[i];
 								Script = DbObj.Script(so);
@@ -229,7 +229,7 @@ namespace DbScripter
 									ScriptMaxLen_Uddt = Script.Count;
 								}
 							} break;
-						case ObjectType.Udtt:
+						case DbObjType.Udtt:
 							{
 								UserDefinedTableType DbObj = (UserDefinedTableType)Objs[i];
 								Script = DbObj.Script(so);
@@ -238,7 +238,7 @@ namespace DbScripter
 									ScriptMaxLen_Udtt = Script.Count;
 								}
 							} break;
-						case ObjectType.Table:
+						case DbObjType.Table:
 							{
 								Table DbObj = (Table)Objs[i];
 								Script = DbObj.Script(so);
@@ -290,7 +290,7 @@ namespace DbScripter
 									Console.WriteLine("Table \"" + DbObj.Name + "\" data size = " + DbObj.DataSpaceUsed / 1000 + " MB.");
 								}
 							} break;
-						case ObjectType.View:
+						case DbObjType.View:
 							{
 								View DbObj = (View)Objs[i];
 								Script = DbObj.Script(so);
@@ -299,7 +299,7 @@ namespace DbScripter
 									ScriptMaxLen_View = Script.Count;
 								}
 							} break;
-						case ObjectType.Udf:
+						case DbObjType.Udf:
 							{
 								UserDefinedFunction DbObj = (UserDefinedFunction)Objs[i];
 								Script = DbObj.Script(so);
@@ -308,7 +308,7 @@ namespace DbScripter
 									ScriptMaxLen_Udf = Script.Count;
 								}
 							} break;
-						case ObjectType.Sp:
+						case DbObjType.Sp:
 							{
 								StoredProcedure DbObj = (StoredProcedure)Objs[i];
 								Script = DbObj.Script(so);
@@ -342,33 +342,33 @@ namespace DbScripter
 
 				switch (Type)
 				{
-					case ObjectType.Default:
+					case DbObjType.Default:
 						{
 							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Default + ".");
 						} break;
-					case ObjectType.Uddt:
+					case DbObjType.Uddt:
 						{
 							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Uddt + ".");
 						} break;
-					case ObjectType.Udtt:
+					case DbObjType.Udtt:
 						{
 							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Udtt + ".");
 						} break;
 					//
-					case ObjectType.Table:
+					case DbObjType.Table:
 						{
 							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Table + ".");
 						} break;
-					case ObjectType.View:
+					case DbObjType.View:
 						{
 							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_View + ".");
 						} break;
 					//
-					case ObjectType.Udf:
+					case DbObjType.Udf:
 						{
 							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Udf + ".");
 						} break;
-					case ObjectType.Sp:
+					case DbObjType.Sp:
 						{
 							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Sp + ".");
 						} break;

@@ -3,12 +3,8 @@ using System.Globalization;
 
 namespace Time
 {
-	public sealed class TimeUtils
+	public static class TimeUtils
 	{
-		private TimeUtils()
-		{
-		}
-
 		public static string IntervalToStringHHHMMSSDec(
 			TimeSpan Interval
 			)

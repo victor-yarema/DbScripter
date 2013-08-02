@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text;
+using System.Threading;
 using Microsoft.SqlServer.Management.Smo;
 using MsSqlSmo;
 using Time;
+using SystemIo;
 
 
 namespace DbScripter
@@ -19,6 +21,7 @@ namespace DbScripter
 				string ServerAddress = null;
 				string DatabaseName = null;
 				string FilenamePrefix = null;
+				string ThreadsNumStr = null;
 
 				for (int arg_index = 0; arg_index < args.Length; arg_index++)
 				{
@@ -60,6 +63,18 @@ namespace DbScripter
 								}
 								FilenamePrefix = args[arg_index + 1];
 							} break;
+						case "/t":
+							{
+								if (ThreadsNumStr != null)
+								{
+									throw new Exception("Multiple keys for ThreadsNumStr.");
+								}
+								if (!(arg_index + 1 < args.Length))
+								{
+									throw new Exception("Missing ThreadsNumStr after corresponding key.");
+								}
+								ThreadsNumStr = args[arg_index + 1];
+							} break;
 					}
 				}
 
@@ -75,6 +90,32 @@ namespace DbScripter
 				{
 					throw new Exception("FilenamePrefix undefined.");
 				}
+				if (ThreadsNumStr == null)
+				{
+					ThreadsNumStr = "4";
+				}
+				int ThreadsNum = Int32.Parse(ThreadsNumStr);
+
+				Console.WriteLine("Parameters:");
+				Console.WriteLine("  ServerAddress = \"" + ServerAddress + "\".");
+				Console.WriteLine("  DatabaseName = \"" + DatabaseName + "\".");
+				Console.WriteLine("  FilenamePrefix = \"" + FilenamePrefix + "\".");
+				Console.WriteLine("  ThreadsNum = \"" + ThreadsNum + "\".");
+
+
+				DateTime TimeBegin = DateTime.UtcNow;
+				Console.WriteLine("Init - Begin.");
+
+				Database[] ThreadsDbs = new Database[ThreadsNum];
+				for (int ThreadIndex = 0; ThreadIndex < ThreadsNum; ThreadIndex++)
+				{
+					Server ThreadSrv = new Server(ServerAddress);
+					ThreadSrv.ConnectionContext.LoginSecure = true;
+					//ThreadSrv.ConnectionContext.Login = "sa";
+					//ThreadSrv.ConnectionContext.Password = "q";
+
+					ThreadsDbs[ThreadIndex] = ThreadSrv.Databases[DatabaseName];
+				}
 
 				Server Srv = new Server(ServerAddress);
 				Srv.ConnectionContext.LoginSecure = true;
@@ -84,85 +125,174 @@ namespace DbScripter
 				Database Db = Srv.Databases[DatabaseName];
 
 
-				DateTime TimeBegin = DateTime.UtcNow;
-				Console.WriteLine("Init - Begin.");
+				List<DbObjsSameType> Arrs = new List<DbObjsSameType>();
 
-				List<object> Defaults_list = new List<object>();
 				DefaultCollection Defaults = Db.Defaults;
+				DbObjSimple[] DefaultsSimple = new DbObjSimple[Defaults.Count];
 				for (int i = 0; i < Defaults.Count; i++)
 				{
-					Defaults_list.Add(Defaults[i]);
+					DefaultsSimple[i] = new DbObjSimple(Defaults[i].Name);
 				}
+				Arrs.Add(new DbObjsSameType(DbObjType.Default, DefaultsSimple));
 
-				List<object> Uddts_list = new List<object>();
 				UserDefinedDataTypeCollection Uddts = Db.UserDefinedDataTypes;
+				DbObjSimple[] UddtsSimple = new DbObjSimple[Uddts.Count];
 				for (int i = 0; i < Uddts.Count; i++)
 				{
-					Uddts_list.Add(Uddts[i]);
+					UddtsSimple[i] = new DbObjSimple(Uddts[i].Name);
 				}
+				Arrs.Add(new DbObjsSameType(DbObjType.Uddt, UddtsSimple));
 
-				List<object> Udtts_list = new List<object>();
 				UserDefinedTableTypeCollection Udtts = Db.UserDefinedTableTypes;
+				DbObjSimple[] UdttsSimple = new DbObjSimple[Udtts.Count];
 				for (int i = 0; i < Udtts.Count; i++)
 				{
-					Udtts_list.Add(Udtts[i]);
+					UdttsSimple[i] = new DbObjSimple(Udtts[i].Name);
 				}
+				Arrs.Add(new DbObjsSameType(DbObjType.Udtt, UdttsSimple));
 
 				//
-				List<object> Tables_list = new List<object>();
 				TableCollection Tables = Db.Tables;
+				DbObjSimple[] TablesSimple = new DbObjSimple[Tables.Count];
 				for (int i = 0; i < Tables.Count; i++)
 				{
-					if (!Tables[i].IsSystemObject)
+					//if (!Tables[i].IsSystemObject)
 					{
-						Tables_list.Add(Tables[i]);
+						TablesSimple[i] = new DbObjSimple(Tables[i].Name);
 					}
 				}
+				Arrs.Add(new DbObjsSameType(DbObjType.Table, TablesSimple));
 
-				List<object> Views_list = new List<object>();
 				ViewCollection Views = Db.Views;
+				DbObjSimple[] ViewsSimple = new DbObjSimple[Views.Count];
 				for (int i = 0; i < Views.Count; i++)
 				{
-					if (!Views[i].IsSystemObject)
+					//if (!Views[i].IsSystemObject)
 					{
-						Views_list.Add(Views[i]);
+						ViewsSimple[i] = new DbObjSimple(Views[i].Name);
 					}
 				}
+				Arrs.Add(new DbObjsSameType(DbObjType.View, ViewsSimple));
 
 				//
-				List<object> Udfs_list = new List<object>();
 				UserDefinedFunctionCollection Udfs = Db.UserDefinedFunctions;
+				DbObjSimple[] UdfsSimple = new DbObjSimple[Udfs.Count];
 				for (int i = 0; i < Udfs.Count; i++)
 				{
-					if (!Udfs[i].IsSystemObject)
+					//if (!Udfs[i].IsSystemObject)
 					{
-						Udfs_list.Add(Udfs[i]);
+						UdfsSimple[i] = new DbObjSimple(Udfs[i].Name);
 					}
 				}
+				Arrs.Add(new DbObjsSameType(DbObjType.Udf, UdfsSimple));
 
-				List<object> Sps_list = new List<object>();
 				StoredProcedureCollection Sps = Db.StoredProcedures;
+				DbObjSimple[] SpsSimple = new DbObjSimple[Sps.Count];
 				for (int i = 0; i < Sps.Count; i++)
 				{
-					if (!Sps[i].IsSystemObject)
+					//if (!Sps[i].IsSystemObject)
 					{
-						Sps_list.Add(Sps[i]);
+						SpsSimple[i] = new DbObjSimple(Sps[i].Name);
 					}
 				}
+				Arrs.Add(new DbObjsSameType(DbObjType.Sp, SpsSimple));
 
 				string InitTimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
 				Console.WriteLine("Init - End. TimeInterval = " + InitTimeInterval + " .");
 
 
-				Script(Defaults_list.ToArray(), DbObjType.Default, FilenamePrefix + " 00 Defaults.sql");
-				Script(Uddts_list.ToArray(), DbObjType.Uddt, FilenamePrefix + " 01 Uddts.sql");
-				Script(Udtts_list.ToArray(), DbObjType.Udtt, FilenamePrefix + " 02 Udtts.sql");
-				//
-				Script(Tables_list.ToArray(), DbObjType.Table, FilenamePrefix + " 03 Tables.sql");
-				Script(Views_list.ToArray(), DbObjType.View, FilenamePrefix + " 04 Views.sql");
-				//
-				Script(Udfs_list.ToArray(), DbObjType.Udf, FilenamePrefix + " 05 Udfs.sql");
-				Script(Sps_list.ToArray(), DbObjType.Sp, FilenamePrefix + " 06 Sps.sql");
+				//DateTime Threads00_TimeBegin = DateTime.UtcNow;
+				//Console.WriteLine("Threads00 - Begin.");
+
+				for (int ArrIndex = 0; ArrIndex < Arrs.Count; ArrIndex++)
+				{
+					DbObjsSameType CurArr = Arrs[ArrIndex];
+
+					DateTime CurArr_TimeBegin = DateTime.UtcNow;
+					Console.WriteLine(CurArr.Type.ToString() + "s - Begin.");
+
+					int BlockLen = CurArr.Items.Length / ThreadsNum;
+					int ReamainingItemsLen = CurArr.Items.Length % ThreadsNum;
+
+					ParameterizedThreadStart Thread_DbObjsSetIsSystem_Pts = new ParameterizedThreadStart(Thread_DbObjsSetIsSystem.ThreadMain);
+					AutoResetEvent[] Threads_Events = new AutoResetEvent[ThreadsNum];
+					Thread_DbObjsSetIsSystem_Param[] Params = new Thread_DbObjsSetIsSystem_Param[ThreadsNum];
+					for (int ThreadIndex = 0; ThreadIndex < ThreadsNum; ThreadIndex++)
+					{
+						int ExtraItemsLen = 0;
+						if ((ThreadIndex + 1) == ThreadsNum)
+						{
+							ExtraItemsLen = ReamainingItemsLen;
+						}
+						Threads_Events[ThreadIndex] = new AutoResetEvent(false);
+						Params[ThreadIndex] = new Thread_DbObjsSetIsSystem_Param(
+							Threads_Events[ThreadIndex],
+							null,
+							ThreadsDbs[ThreadIndex],
+							CurArr,
+							ThreadIndex * BlockLen,
+							(ThreadIndex + 1) * BlockLen + ExtraItemsLen
+							);
+						Thread CurThread = new Thread(Thread_DbObjsSetIsSystem_Pts);
+						CurThread.Start(Params[ThreadIndex]);
+					}
+					WaitHandle.WaitAll(Threads_Events);
+					bool ThreadException = false;
+					for (int ThreadIndex = 0; ThreadIndex < ThreadsNum; ThreadIndex++)
+					{
+						if (Params[ThreadIndex].Result != null)
+						{
+							ThreadException = true;
+							Console.WriteLine("CurArr.Type = " + CurArr.Type + ", ThreadIndex = " + ThreadIndex + ", Exception:");
+							Console.WriteLine(Params[ThreadIndex].Result.ToString());
+						}
+					}
+					if (ThreadException)
+					{
+						throw new Exception("Thread(s) Exception(s).");
+					}
+
+					List<DbObjSimple> CurArrItemsNonSystem = new List<DbObjSimple>(CurArr.Items.Length);
+					for (int i = 0; i < CurArr.Items.Length; i++)
+					{
+						if (!CurArr.Items[i].IsSystem)
+						{
+							CurArrItemsNonSystem.Add(CurArr.Items[i]);
+						}
+					}
+					CurArr.Items = CurArrItemsNonSystem.ToArray();
+
+					string CurArr_TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - CurArr_TimeBegin);
+					Console.WriteLine(CurArr.Type.ToString() + "s - End. TimeInterval = " + CurArr_TimeInterval + " .");
+				}
+
+				//string Threads00_TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - Threads00_TimeBegin);
+				//Console.WriteLine("Threads00 - End. TimeInterval = " + Threads00_TimeInterval + " .");
+
+
+
+				string[] DbObjTypesFilenames = new string[] {
+					"00 Defaults.sql",
+					"01 Uddts.sql",
+					"02 Udtts.sql",
+					//
+					"03 Tables.sql",
+					"04 Views.sql",
+					//
+					"05 Udfs.sql",
+					"06 Sps.sql",
+				};
+
+				for (int ArrIndex = 0; ArrIndex < Arrs.Count; ArrIndex++)
+				{
+					DbObjsSameType CurArr = Arrs[ArrIndex];
+					Script(
+						CurArr.Items,
+						CurArr.Type,
+						FilenamePrefix + " " + DbObjTypesFilenames[ArrIndex]
+						);
+				}
+
 
 				Console.WriteLine();
 				string TotalTimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
@@ -174,15 +304,15 @@ namespace DbScripter
 			}
 		}
 
-		static void Script(object[] Objs, DbObjType Type, string Filename)
+		static void Script(DbObjSimple[] Objs, DbObjType Type, string Filename)
 		{
 			if (System.IO.File.Exists(Filename))
 			{
 				throw new Exception("File \"" + Filename + "\" already exists.");
 			}
 
-			DateTime TimeBegin = DateTime.UtcNow;
-			Console.WriteLine(Type.ToString() + "s - Begin.");
+			//DateTime TimeBegin = DateTime.UtcNow;
+			//Console.WriteLine(Type.ToString() + "s - Begin.");
 			Console.WriteLine(Type.ToString() + "s - Objs.Length = " + Objs.Length + ".");
 
 			ScriptingOptions so = new ScriptingOptions();
@@ -214,13 +344,16 @@ namespace DbScripter
 
 				for (int i = 0; i < Objs.Length; i++)
 				{
-					StringCollection Script;
+					DbObjSimple DbObj = Objs[i];
+					if (DbObj.IsSystem)
+					{
+						continue;
+					}
+					StringCollection Script = DbObj.Script;
 					switch (Type)
 					{
 						case DbObjType.Default:
 							{
-								Default DbObj = (Default)Objs[i];
-								Script = DbObj.Script(so);
 								if (ScriptMaxLen_Default < Script.Count)
 								{
 									ScriptMaxLen_Default = Script.Count;
@@ -228,8 +361,6 @@ namespace DbScripter
 							} break;
 						case DbObjType.Uddt:
 							{
-								UserDefinedDataType DbObj = (UserDefinedDataType)Objs[i];
-								Script = DbObj.Script(so);
 								if (ScriptMaxLen_Uddt < Script.Count)
 								{
 									ScriptMaxLen_Uddt = Script.Count;
@@ -237,18 +368,14 @@ namespace DbScripter
 							} break;
 						case DbObjType.Udtt:
 							{
-								UserDefinedTableType DbObj = (UserDefinedTableType)Objs[i];
-								Script = DbObj.Script(so);
 								if (ScriptMaxLen_Udtt < Script.Count)
 								{
 									ScriptMaxLen_Udtt = Script.Count;
 								}
 							} break;
+						//
 						case DbObjType.Table:
 							{
-								Table DbObj = (Table)Objs[i];
-								Script = DbObj.Script(so);
-
 								if (Script[0] != SET_ANSI_NULLS_ON)
 								{
 									throw new Exception("Invalid format.");
@@ -288,27 +415,24 @@ namespace DbScripter
 
 								if (Script.Count >= 16)
 								{
-									Console.WriteLine("Table \"" + DbObj.Name + "\" Script.Count = " + Script.Count + ".");
+									Console.WriteLine("  Table \"" + DbObj.Name + "\" Script.Count = " + Script.Count + ".");
 								}
 
-								if (DbObj.DataSpaceUsed > 128 * 1000)
+								/*if (DbObj.DataSpaceUsed > 128 * 1000)
 								{
 									Console.WriteLine("Table \"" + DbObj.Name + "\" data size = " + DbObj.DataSpaceUsed / 1000 + " MB.");
-								}
+								}*/
 							} break;
 						case DbObjType.View:
 							{
-								View DbObj = (View)Objs[i];
-								Script = DbObj.Script(so);
 								if (ScriptMaxLen_View < Script.Count)
 								{
 									ScriptMaxLen_View = Script.Count;
 								}
 							} break;
+						//
 						case DbObjType.Udf:
 							{
-								UserDefinedFunction DbObj = (UserDefinedFunction)Objs[i];
-								Script = DbObj.Script(so);
 								if (ScriptMaxLen_Udf < Script.Count)
 								{
 									ScriptMaxLen_Udf = Script.Count;
@@ -316,9 +440,6 @@ namespace DbScripter
 							} break;
 						case DbObjType.Sp:
 							{
-								StoredProcedure DbObj = (StoredProcedure)Objs[i];
-								Script = DbObj.Script(so);
-
 								if (Script[0] != SET_ANSI_NULLS_ON)
 								{
 									throw new Exception("Invalid format.");
@@ -339,13 +460,14 @@ namespace DbScripter
 							throw new Exception("Unknown Type = \"" + Type.ToString() + "\".");
 					}
 
-					StreamWriter_Write_StringCollection(File, Script);
+					StreamWriterUtils.Write_StringCollection(File, Script);
 					File.WriteLine();
 					File.WriteLine();
 					File.WriteLine();
 					File.WriteLine();
 				}
 
+				/*
 				switch (Type)
 				{
 					case DbObjType.Default:
@@ -381,10 +503,11 @@ namespace DbScripter
 					default:
 						throw new Exception("Unknown Type = \"" + Type.ToString() + "\".");
 				}
+				*/
 
 			}
-			string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
-			Console.WriteLine(Type.ToString() + "s - End. TimeInterval = " + TimeInterval + " .");
+			//string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			//Console.WriteLine(Type.ToString() + "s - End. TimeInterval = " + TimeInterval + " .");
 		}
 
 		const string SET_ANSI_NULLS_ON = "SET ANSI_NULLS ON";
@@ -394,14 +517,6 @@ namespace DbScripter
 		const string ALTER_TABLE = "ALTER TABLE";
 		const string FOREIGN_KEY = "FOREIGN KEY";
 		const string FOREIGN_KEY_ = FOREIGN_KEY + "(";
-
-		static void StreamWriter_Write_StringCollection(StreamWriter sw, StringCollection sc)
-		{
-			foreach (string s in sc)
-			{
-				sw.WriteLine(s);
-			}
-		}
 
 	}
 }

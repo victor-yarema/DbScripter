@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 
-
 namespace Time
 {
 	public sealed class TimeUtils

@@ -342,6 +342,9 @@ namespace DbScripter
 				//
 				int ScriptMaxLen_Ftc = 0;
 
+				double TablesDataSpaceUsed_Sum = 0;
+				double TablesIndexesSpaceUsed_Sum = 0;
+
 				for (int i = 0; i < Objs.Length; i++)
 				{
 					DbObjSimple DbObj = Objs[i];
@@ -426,6 +429,9 @@ namespace DbScripter
 								{
 									Console.WriteLine("Table \"" + DbObj.Name + "\" index(es) size = " + DbObj.IndexSpaceUsed / 1000 + " MB.");
 								}
+
+								TablesDataSpaceUsed_Sum += DbObj.DataSpaceUsed;
+								TablesIndexesSpaceUsed_Sum += DbObj.IndexSpaceUsed;
 							} break;
 						case DbObjType.View:
 							{
@@ -478,6 +484,12 @@ namespace DbScripter
 					File.WriteLine();
 					File.WriteLine();
 					File.WriteLine();
+				}
+
+				if (Type == DbObjType.Table)
+				{
+					Console.WriteLine("TablesDataSpaceUsed_Sum = " + TablesDataSpaceUsed_Sum / 1000 + " MB.");
+					Console.WriteLine("TablesIndexesSpaceUsed_Sum = " + TablesIndexesSpaceUsed_Sum / 1000 + " MB.");
 				}
 
 				/*

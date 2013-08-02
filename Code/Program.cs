@@ -413,10 +413,10 @@ namespace DbScripter
 									ScriptMaxLen_Table = Script.Count;
 								}
 
-								if (Script.Count >= 16)
+								/*if (Script.Count >= 16)
 								{
 									Console.WriteLine("  Table \"" + DbObj.Name + "\" Script.Count = " + Script.Count + ".");
-								}
+								}*/
 
 								/*if (DbObj.DataSpaceUsed > 128 * 1000)
 								{

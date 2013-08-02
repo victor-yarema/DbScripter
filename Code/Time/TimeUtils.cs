@@ -4,9 +4,9 @@ using System.Globalization;
 
 namespace Time
 {
-	public sealed class TimeUtilities
+	public sealed class TimeUtils
 	{
-		private TimeUtilities()
+		private TimeUtils()
 		{
 		}
 

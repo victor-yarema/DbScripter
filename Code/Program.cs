@@ -197,7 +197,7 @@ namespace DbScripter
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Sp, SpsSimple));
 
-				string InitTimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+				string InitTimeInterval = TimeUtils.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
 				Console.WriteLine("Init - End. TimeInterval = " + InitTimeInterval + " .");
 
 
@@ -262,11 +262,11 @@ namespace DbScripter
 					}
 					CurArr.Items = CurArrItemsNonSystem.ToArray();
 
-					string CurArr_TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - CurArr_TimeBegin);
+					string CurArr_TimeInterval = TimeUtils.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - CurArr_TimeBegin);
 					Console.WriteLine(CurArr.Type.ToString() + "s - End. TimeInterval = " + CurArr_TimeInterval + " .");
 				}
 
-				//string Threads00_TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - Threads00_TimeBegin);
+				//string Threads00_TimeInterval = TimeUtils.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - Threads00_TimeBegin);
 				//Console.WriteLine("Threads00 - End. TimeInterval = " + Threads00_TimeInterval + " .");
 
 
@@ -295,7 +295,7 @@ namespace DbScripter
 
 
 				Console.WriteLine();
-				string TotalTimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+				string TotalTimeInterval = TimeUtils.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
 				Console.WriteLine("TotalTimeInterval = " + TotalTimeInterval + " .");
 			}
 			catch (Exception ex)
@@ -506,7 +506,7 @@ namespace DbScripter
 				*/
 
 			}
-			//string TimeInterval = TimeUtilities.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
+			//string TimeInterval = TimeUtils.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
 			//Console.WriteLine(Type.ToString() + "s - End. TimeInterval = " + TimeInterval + " .");
 		}
 

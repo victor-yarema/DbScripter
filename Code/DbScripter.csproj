@@ -95,7 +95,7 @@
     <Compile Include="SystemIo\StreamWriterUtils.cs" />
     <Compile Include="Thread_DbObjsSetIsSystem.cs" />
     <Compile Include="Thread_DbObjsSetIsSystem_Param.cs" />
-    <Compile Include="Time\TimeUtilities.cs" />
+    <Compile Include="Time\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

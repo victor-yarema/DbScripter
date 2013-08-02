@@ -62,6 +62,7 @@ namespace DbScripter
 								Parameter.DbObjs.Items[i].Script = DbObj.Script(so);
 
 								Parameter.DbObjs.Items[i].DataSpaceUsed = DbObj.DataSpaceUsed;
+								Parameter.DbObjs.Items[i].IndexSpaceUsed = DbObj.IndexSpaceUsed;
 							} break;
 						case DbObjType.View:
 							{

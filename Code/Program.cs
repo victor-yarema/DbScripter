@@ -422,6 +422,10 @@ namespace DbScripter
 								{
 									Console.WriteLine("Table \"" + DbObj.Name + "\" data size = " + DbObj.DataSpaceUsed / 1000 + " MB.");
 								}
+								if (DbObj.IndexSpaceUsed > 128 * 1000)
+								{
+									Console.WriteLine("Table \"" + DbObj.Name + "\" index(es) size = " + DbObj.IndexSpaceUsed / 1000 + " MB.");
+								}
 							} break;
 						case DbObjType.View:
 							{

@@ -481,6 +481,7 @@ namespace DbScripter
 							throw new Exception("Unknown Type = \"" + Type.ToString() + "\".");
 					}
 
+					File.WriteLine("---------------- " + DbObj.Name);
 					StreamWriterUtils.Write_StringCollection(File, Script);
 					File.WriteLine();
 					File.WriteLine();

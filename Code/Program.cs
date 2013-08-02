@@ -326,19 +326,6 @@ namespace DbScripter
 			//Console.WriteLine(Type.ToString() + "s - Begin.");
 			Console.WriteLine(Type.ToString() + "s - Objs.Length = " + Objs.Length + ".");
 
-			ScriptingOptions so = new ScriptingOptions();
-			so.Add(ScriptOption.DriAll);
-			//so.Add(ScriptOption.Permissions);
-			//so.Add(ScriptOption.IncludeIfNotExists);
-			if (Type == DbObjType.Table)
-			{
-				so.Add(ScriptOption.Triggers);
-				so.Add(ScriptOption.Bindings);
-				so.Add(ScriptOption.ClusteredIndexes);
-				//so.Add(ScriptOption.WithDependencies);
-				so.Add(ScriptOption.ExtendedProperties);
-			}
-
 			using (StreamWriter File = new StreamWriter(Filename, false, Encoding.UTF8))
 			{
 				File.WriteLine();

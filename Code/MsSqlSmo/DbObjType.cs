@@ -16,5 +16,7 @@ namespace MsSqlSmo
 		//
 		Udf,
 		Sp,
+		//
+		Ftc,
 	}
 }

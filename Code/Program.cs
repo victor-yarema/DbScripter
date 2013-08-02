@@ -197,6 +197,15 @@ namespace DbScripter
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Sp, SpsSimple));
 
+				//
+				FullTextCatalogCollection Ftcs = Db.FullTextCatalogs;
+				DbObjSimple[] FtcsSimple = new DbObjSimple[Ftcs.Count];
+				for (int i = 0; i < Ftcs.Count; i++)
+				{
+					FtcsSimple[i] = new DbObjSimple(Ftcs[i].Name);
+				}
+				Arrs.Add(new DbObjsSameType(DbObjType.Ftc, FtcsSimple));
+
 				string InitTimeInterval = TimeUtils.IntervalToStringHHHMMSSLLLDec(DateTime.UtcNow - TimeBegin);
 				Console.WriteLine("Init - End. TimeInterval = " + InitTimeInterval + " .");
 
@@ -281,6 +290,8 @@ namespace DbScripter
 					//
 					"05 Udfs.sql",
 					"06 Sps.sql",
+					//
+					"07 Ftc.sql",
 				};
 
 				for (int ArrIndex = 0; ArrIndex < Arrs.Count; ArrIndex++)
@@ -341,6 +352,8 @@ namespace DbScripter
 				//
 				int ScriptMaxLen_Udf = 0;
 				int ScriptMaxLen_Sp = 0;
+				//
+				int ScriptMaxLen_Ftc = 0;
 
 				for (int i = 0; i < Objs.Length; i++)
 				{
@@ -456,6 +469,14 @@ namespace DbScripter
 									ScriptMaxLen_Sp = Script.Count;
 								}
 							} break;
+						//
+						case DbObjType.Ftc:
+							{
+								if (ScriptMaxLen_Ftc < Script.Count)
+								{
+									ScriptMaxLen_Ftc = Script.Count;
+								}
+							} break;
 						default:
 							throw new Exception("Unknown Type = \"" + Type.ToString() + "\".");
 					}
@@ -499,6 +520,11 @@ namespace DbScripter
 					case DbObjType.Sp:
 						{
 							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Sp + ".");
+						} break;
+					//
+					case DbObjType.Ftc:
+						{
+							Console.WriteLine(Type.ToString() + "s - ScriptMaxLen = " + ScriptMaxLen_Ftc + ".");
 						} break;
 					default:
 						throw new Exception("Unknown Type = \"" + Type.ToString() + "\".");

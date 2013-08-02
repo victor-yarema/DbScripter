@@ -26,6 +26,7 @@ namespace DbScripter
 					so.Add(ScriptOption.ClusteredIndexes);
 					//so.Add(ScriptOption.WithDependencies);
 					so.Add(ScriptOption.ExtendedProperties);
+					so.Add(ScriptOption.FullTextIndexes);
 				}
 
 				for (int i = Parameter.DbObjs_BeginIndex; i < Parameter.DbObjs_EndIndex; i++)
@@ -95,6 +96,12 @@ namespace DbScripter
 									break;
 								}
 								Parameter.DbObjs.Items[i].IsSystem = DbObj.IsSystemObject;
+								Parameter.DbObjs.Items[i].Script = DbObj.Script(so);
+							} break;
+						//
+						case DbObjType.Ftc:
+							{
+								FullTextCatalog DbObj = (FullTextCatalog)Parameter.Db.FullTextCatalogs[Parameter.DbObjs.Items[i].Name];
 								Parameter.DbObjs.Items[i].Script = DbObj.Script(so);
 							} break;
 						default:

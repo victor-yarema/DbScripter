@@ -60,6 +60,8 @@ namespace DbScripter
 								}
 								Parameter.DbObjs.Items[i].IsSystem = DbObj.IsSystemObject;
 								Parameter.DbObjs.Items[i].Script = DbObj.Script(so);
+
+								Parameter.DbObjs.Items[i].DataSpaceUsed = DbObj.DataSpaceUsed;
 							} break;
 						case DbObjType.View:
 							{

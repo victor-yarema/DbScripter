@@ -418,10 +418,10 @@ namespace DbScripter
 									Console.WriteLine("  Table \"" + DbObj.Name + "\" Script.Count = " + Script.Count + ".");
 								}*/
 
-								/*if (DbObj.DataSpaceUsed > 128 * 1000)
+								if (DbObj.DataSpaceUsed > 128 * 1000)
 								{
 									Console.WriteLine("Table \"" + DbObj.Name + "\" data size = " + DbObj.DataSpaceUsed / 1000 + " MB.");
-								}*/
+								}
 							} break;
 						case DbObjType.View:
 							{

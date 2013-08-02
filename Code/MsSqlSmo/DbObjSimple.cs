@@ -11,6 +11,7 @@ namespace MsSqlSmo
 		public string Name;
 		public bool IsSystem = false;
 		public StringCollection Script = null;
+		public double DataSpaceUsed = 0;
 
 		public DbObjSimple(
 			string _Name

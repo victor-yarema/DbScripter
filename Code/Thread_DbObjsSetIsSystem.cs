@@ -23,7 +23,7 @@ namespace DbScripter
 				{
 					so.Add(ScriptOption.Triggers);
 					so.Add(ScriptOption.Bindings);
-					so.Add(ScriptOption.ClusteredIndexes);
+					so.Add(ScriptOption.Indexes);
 					//so.Add(ScriptOption.WithDependencies);
 					so.Add(ScriptOption.ExtendedProperties);
 					so.Add(ScriptOption.FullTextIndexes);

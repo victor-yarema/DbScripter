@@ -317,11 +317,6 @@ namespace DbScripter
 
 		static void Script(DbObjSimple[] Objs, DbObjType Type, string Filename)
 		{
-			if (System.IO.File.Exists(Filename))
-			{
-				throw new Exception("File \"" + Filename + "\" already exists.");
-			}
-
 			//DateTime TimeBegin = DateTime.UtcNow;
 			//Console.WriteLine(Type.ToString() + "s - Begin.");
 			Console.WriteLine(Type.ToString() + "s - Objs.Length = " + Objs.Length + ".");

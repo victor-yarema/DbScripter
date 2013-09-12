@@ -18,12 +18,12 @@ namespace DbScripter
 		public int DbObjs_EndIndex;
 
 		public Thread_DbObjsSetIsSystem_Param(
-			AutoResetEvent _EndEvent,
-			Exception _Result,
-			Database _Db,
-			DbObjsSameType _DbObjs,
-			int _DbObjs_BeginIndex,
-			int _DbObjs_EndIndex
+			AutoResetEvent _EndEvent
+			, Exception _Result
+			, Database _Db
+			, DbObjsSameType _DbObjs
+			, int _DbObjs_BeginIndex
+			, int _DbObjs_EndIndex
 			)
 		{
 			this.EndEvent = _EndEvent;

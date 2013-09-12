@@ -11,8 +11,8 @@ namespace MsSqlSmo
 		public DbObjSimple[] Items = new DbObjSimple[0];
 
 		public DbObjsSameType(
-			DbObjType _Type,
-			DbObjSimple[] _Items
+			DbObjType _Type
+			, DbObjSimple[] _Items
 			)
 		{
 			this.Type = _Type;

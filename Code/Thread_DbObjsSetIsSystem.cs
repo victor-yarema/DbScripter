@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.SqlServer.Management.Smo;
 using MsSqlSmo;
 
@@ -6,7 +7,7 @@ namespace DbScripter
 {
 	static class Thread_DbObjsSetIsSystem
 	{
-		public static void ThreadMain(object ParameterObject)
+		private static void ThreadMain(object ParameterObject)
 		{
 			Thread_DbObjsSetIsSystem_Param Parameter = (Thread_DbObjsSetIsSystem_Param)ParameterObject;
 			Parameter.Result = null;
@@ -115,5 +116,13 @@ namespace DbScripter
 			}
 			Parameter.EndEvent.Set();
 		}
+
+		public static Thread Start(Thread_DbObjsSetIsSystem_Param Parameter)
+		{
+			Thread Thread = new Thread(new ParameterizedThreadStart(ThreadMain));
+			Thread.Start(Parameter);
+			return Thread;
+		}
+
 	}
 }

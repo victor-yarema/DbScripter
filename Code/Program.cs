@@ -223,7 +223,6 @@ namespace DbScripter
 					int BlockLen = CurArr.Items.Length / ThreadsNum;
 					int RemainingItemsLen = CurArr.Items.Length % ThreadsNum;
 
-					ParameterizedThreadStart Thread_DbObjsSetIsSystem_Pts = new ParameterizedThreadStart(Thread_DbObjsSetIsSystem.ThreadMain);
 					AutoResetEvent[] Threads_Events = new AutoResetEvent[ThreadsNum];
 					Thread_DbObjsSetIsSystem_Param[] Params = new Thread_DbObjsSetIsSystem_Param[ThreadsNum];
 					for (int ThreadIndex = 0; ThreadIndex < ThreadsNum; ThreadIndex++)
@@ -242,8 +241,7 @@ namespace DbScripter
 							ThreadIndex * BlockLen,
 							(ThreadIndex + 1) * BlockLen + ExtraItemsLen
 							);
-						Thread CurThread = new Thread(Thread_DbObjsSetIsSystem_Pts);
-						CurThread.Start(Params[ThreadIndex]);
+						Thread CurThread = Thread_DbObjsSetIsSystem.Start(Params[ThreadIndex]);
 					}
 					WaitHandle.WaitAll(Threads_Events);
 					bool ThreadException = false;

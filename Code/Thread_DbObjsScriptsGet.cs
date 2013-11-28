@@ -5,11 +5,11 @@ using MsSqlSmo;
 
 namespace DbScripter
 {
-	static class Thread_DbObjsSetIsSystem
+	static class Thread_DbObjsScriptsGet
 	{
 		private static void ThreadMain(object ParameterObject)
 		{
-			Thread_DbObjsSetIsSystem_Param Parameter = (Thread_DbObjsSetIsSystem_Param)ParameterObject;
+			Thread_DbObjsScriptsGet_Param Parameter = (Thread_DbObjsScriptsGet_Param)ParameterObject;
 			Parameter.Result = null;
 			try
 			{
@@ -117,7 +117,7 @@ namespace DbScripter
 			Parameter.EndEvent.Set();
 		}
 
-		public static Thread Start(Thread_DbObjsSetIsSystem_Param Parameter)
+		public static Thread Start(Thread_DbObjsScriptsGet_Param Parameter)
 		{
 			Thread Thread = new Thread(new ParameterizedThreadStart(ThreadMain));
 			Thread.Start(Parameter);

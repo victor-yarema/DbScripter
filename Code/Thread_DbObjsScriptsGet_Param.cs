@@ -5,7 +5,7 @@ using MsSqlSmo;
 
 namespace DbScripter
 {
-	class Thread_DbObjsSetIsSystem_Param
+	class Thread_DbObjsScriptsGet_Param
 	{
 		public AutoResetEvent EndEvent;
 		public Exception Result;
@@ -14,7 +14,7 @@ namespace DbScripter
 		public int DbObjs_BeginIndex;
 		public int DbObjs_EndIndex;
 
-		public Thread_DbObjsSetIsSystem_Param(
+		public Thread_DbObjsScriptsGet_Param(
 			AutoResetEvent _EndEvent
 			, Exception _Result
 			, Database _Db

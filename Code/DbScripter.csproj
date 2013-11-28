@@ -93,8 +93,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SystemIo\StreamWriterUtils.cs" />
-    <Compile Include="Thread_DbObjsSetIsSystem.cs" />
-    <Compile Include="Thread_DbObjsSetIsSystem_Param.cs" />
+    <Compile Include="Thread_DbObjsScriptsGet.cs" />
+    <Compile Include="Thread_DbObjsScriptsGet_Param.cs" />
     <Compile Include="Time\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>

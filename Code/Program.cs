@@ -20,6 +20,8 @@ namespace DbScripter
 			{
 				string ServerAddress = null;
 				string DatabaseName = null;
+				string ExplicitLogin = null;
+				string ExplicitPassword = null;
 				string FilenamePrefix = null;
 				string ThreadsNumStr = null;
 
@@ -50,6 +52,30 @@ namespace DbScripter
 									throw new Exception("Missing DatabaseName after corresponding key.");
 								}
 								DatabaseName = args[arg_index + 1];
+							} break;
+						case "/l":
+							{
+								if (ExplicitLogin != null)
+								{
+									throw new Exception("Multiple keys for ExplicitLogin.");
+								}
+								if (!(arg_index + 1 < args.Length))
+								{
+									throw new Exception("Missing ExplicitLogin after corresponding key.");
+								}
+								ExplicitLogin = args[arg_index + 1];
+							} break;
+						case "/p":
+							{
+								if (ExplicitPassword != null)
+								{
+									throw new Exception("Multiple keys for ExplicitPassword.");
+								}
+								if (!(arg_index + 1 < args.Length))
+								{
+									throw new Exception("Missing ExplicitPassword after corresponding key.");
+								}
+								ExplicitPassword = args[arg_index + 1];
 							} break;
 						case "/f":
 							{
@@ -86,6 +112,11 @@ namespace DbScripter
 				{
 					throw new Exception("DatabaseName undefined.");
 				}
+				if ((ExplicitLogin != null) ^ (ExplicitPassword != null))
+				{
+					throw new Exception("ExplicitLogin and ExplicitPassword should be used only together.");
+				}
+				bool ExplicitLoginMode = (ExplicitLogin != null);
 				if (FilenamePrefix == null)
 				{
 					throw new Exception("FilenamePrefix undefined.");
@@ -99,6 +130,10 @@ namespace DbScripter
 				Console.WriteLine("Parameters:");
 				Console.WriteLine("  ServerAddress = \"" + ServerAddress + "\".");
 				Console.WriteLine("  DatabaseName = \"" + DatabaseName + "\".");
+				if (ExplicitLoginMode)
+				{
+					Console.WriteLine("  ExplicitLogin = \"" + ExplicitLogin + "\".");
+				}
 				Console.WriteLine("  FilenamePrefix = \"" + FilenamePrefix + "\".");
 				Console.WriteLine("  ThreadsNum = \"" + ThreadsNum + "\".");
 
@@ -110,17 +145,23 @@ namespace DbScripter
 				for (int ThreadIndex = 0; ThreadIndex < ThreadsNum; ThreadIndex++)
 				{
 					Server ThreadSrv = new Server(ServerAddress);
-					ThreadSrv.ConnectionContext.LoginSecure = true;
-					//ThreadSrv.ConnectionContext.Login = "sa";
-					//ThreadSrv.ConnectionContext.Password = "q";
+					ThreadSrv.ConnectionContext.LoginSecure = !ExplicitLoginMode;
+					if (ExplicitLoginMode)
+					{
+						ThreadSrv.ConnectionContext.Login = ExplicitLogin;
+						ThreadSrv.ConnectionContext.Password = ExplicitPassword;
+					}
 
 					ThreadsDbs[ThreadIndex] = ThreadSrv.Databases[DatabaseName];
 				}
 
 				Server Srv = new Server(ServerAddress);
-				Srv.ConnectionContext.LoginSecure = true;
-				//Srv.ConnectionContext.Login = "sa";
-				//Srv.ConnectionContext.Password = "q";
+				Srv.ConnectionContext.LoginSecure = !ExplicitLoginMode;
+				if (ExplicitLoginMode)
+				{
+					Srv.ConnectionContext.Login = ExplicitLogin;
+					Srv.ConnectionContext.Password = ExplicitPassword;
+				}
 
 				Database Db = Srv.Databases[DatabaseName];
 

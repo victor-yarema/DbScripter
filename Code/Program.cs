@@ -172,7 +172,7 @@ namespace DbScripter
 				DbObjSimple[] DefaultsSimple = new DbObjSimple[Defaults.Count];
 				for (int i = 0; i < Defaults.Count; i++)
 				{
-					DefaultsSimple[i] = new DbObjSimple(Defaults[i].Name);
+					DefaultsSimple[i] = new DbObjSimple(Defaults[i].Name, Defaults[i].Schema);
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Default, DefaultsSimple));
 
@@ -180,7 +180,7 @@ namespace DbScripter
 				DbObjSimple[] UddtsSimple = new DbObjSimple[Uddts.Count];
 				for (int i = 0; i < Uddts.Count; i++)
 				{
-					UddtsSimple[i] = new DbObjSimple(Uddts[i].Name);
+					UddtsSimple[i] = new DbObjSimple(Uddts[i].Name, Uddts[i].Schema);
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Uddt, UddtsSimple));
 
@@ -188,7 +188,7 @@ namespace DbScripter
 				DbObjSimple[] UdttsSimple = new DbObjSimple[Udtts.Count];
 				for (int i = 0; i < Udtts.Count; i++)
 				{
-					UdttsSimple[i] = new DbObjSimple(Udtts[i].Name);
+					UdttsSimple[i] = new DbObjSimple(Udtts[i].Name, Udtts[i].Schema);
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Udtt, UdttsSimple));
 
@@ -199,7 +199,7 @@ namespace DbScripter
 				{
 					//if (!Tables[i].IsSystemObject)
 					{
-						TablesSimple[i] = new DbObjSimple(Tables[i].Name);
+						TablesSimple[i] = new DbObjSimple(Tables[i].Name, Tables[i].Schema);
 					}
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Table, TablesSimple));
@@ -210,7 +210,7 @@ namespace DbScripter
 				{
 					//if (!Views[i].IsSystemObject)
 					{
-						ViewsSimple[i] = new DbObjSimple(Views[i].Name);
+						ViewsSimple[i] = new DbObjSimple(Views[i].Name, Views[i].Schema);
 					}
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.View, ViewsSimple));
@@ -222,7 +222,7 @@ namespace DbScripter
 				{
 					//if (!Udfs[i].IsSystemObject)
 					{
-						UdfsSimple[i] = new DbObjSimple(Udfs[i].Name);
+						UdfsSimple[i] = new DbObjSimple(Udfs[i].Name, Udfs[i].Schema);
 					}
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Udf, UdfsSimple));
@@ -233,7 +233,7 @@ namespace DbScripter
 				{
 					//if (!Sps[i].IsSystemObject)
 					{
-						SpsSimple[i] = new DbObjSimple(Sps[i].Name);
+						SpsSimple[i] = new DbObjSimple(Sps[i].Name, Sps[i].Schema);
 					}
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Sp, SpsSimple));
@@ -243,7 +243,7 @@ namespace DbScripter
 				DbObjSimple[] FtcsSimple = new DbObjSimple[Ftcs.Count];
 				for (int i = 0; i < Ftcs.Count; i++)
 				{
-					FtcsSimple[i] = new DbObjSimple(Ftcs[i].Name);
+					FtcsSimple[i] = new DbObjSimple(Ftcs[i].Name, null);
 				}
 				Arrs.Add(new DbObjsSameType(DbObjType.Ftc, FtcsSimple));
 

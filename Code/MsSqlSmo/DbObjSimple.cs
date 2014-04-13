@@ -5,6 +5,7 @@ namespace MsSqlSmo
 	class DbObjSimple
 	{
 		public string Name;
+		public string Schema;
 		public bool IsSystem = false;
 		public StringCollection Script = null;
 		public double DataSpaceUsed = 0;
@@ -12,9 +13,11 @@ namespace MsSqlSmo
 
 		public DbObjSimple(
 			string _Name
+			,string _Schema
 			)
 		{
 			this.Name = _Name;
+			this.Schema = _Schema;
 		}
 
 	}

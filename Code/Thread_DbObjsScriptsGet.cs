@@ -38,26 +38,26 @@ namespace DbScripter
 							{
 								case DbObjType.Default:
 									{
-										Default DbObj = (Default)Parameter.Db.Defaults[Parameter.DbObjs.Items[i].Name];
+										Default DbObj = (Default)Parameter.Db.Defaults[Parameter.DbObjs.Items[i].Name, Parameter.DbObjs.Items[i].Schema];
 										Parameter.DbObjs.Items[i].Script = DbObj.Script(so);
 									} break;
 								case DbObjType.Uddt:
 									{
-										UserDefinedDataType DbObj = (UserDefinedDataType)Parameter.Db.UserDefinedDataTypes[Parameter.DbObjs.Items[i].Name];
+										UserDefinedDataType DbObj = (UserDefinedDataType)Parameter.Db.UserDefinedDataTypes[Parameter.DbObjs.Items[i].Name, Parameter.DbObjs.Items[i].Schema];
 										Parameter.DbObjs.Items[i].Script = DbObj.Script(so);
 									} break;
 								case DbObjType.Udtt:
 									{
-										UserDefinedTableType DbObj = (UserDefinedTableType)Parameter.Db.UserDefinedTableTypes[Parameter.DbObjs.Items[i].Name];
+										UserDefinedTableType DbObj = (UserDefinedTableType)Parameter.Db.UserDefinedTableTypes[Parameter.DbObjs.Items[i].Name, Parameter.DbObjs.Items[i].Schema];
 										Parameter.DbObjs.Items[i].Script = DbObj.Script(so);
 									} break;
 								//
 								case DbObjType.Table:
 									{
-										Table DbObj = (Table)Parameter.Db.Tables[Parameter.DbObjs.Items[i].Name];
+										Table DbObj = (Table)Parameter.Db.Tables[Parameter.DbObjs.Items[i].Name, Parameter.DbObjs.Items[i].Schema];
 										if (DbObj == null || DbObj.IsSystemObject)
 										{
-											//throw new Exception("Can't find DbObj with name \"" + Parameter.DbObjs.Items[i].Name + "\".");
+											//throw new Exception("Can't find DbObj with name \"" + Parameter.DbObjs.Items[i].Schema + "." + Parameter.DbObjs.Items[i].Name + "\".");
 											Parameter.DbObjs.Items[i].IsSystem = true;
 											break;
 										}
@@ -69,10 +69,10 @@ namespace DbScripter
 									} break;
 								case DbObjType.View:
 									{
-										View DbObj = (View)Parameter.Db.Views[Parameter.DbObjs.Items[i].Name];
+										View DbObj = (View)Parameter.Db.Views[Parameter.DbObjs.Items[i].Name, Parameter.DbObjs.Items[i].Schema];
 										if (DbObj == null || DbObj.IsSystemObject)
 										{
-											//throw new Exception("Can't find DbObj with name \"" + Parameter.DbObjs.Items[i].Name + "\".");
+											//throw new Exception("Can't find DbObj with name \"" + Parameter.DbObjs.Items[i].Schema + "." + Parameter.DbObjs.Items[i].Name + "\".");
 											Parameter.DbObjs.Items[i].IsSystem = true;
 											break;
 										}
@@ -82,10 +82,10 @@ namespace DbScripter
 								//
 								case DbObjType.Udf:
 									{
-										UserDefinedFunction DbObj = (UserDefinedFunction)Parameter.Db.UserDefinedFunctions[Parameter.DbObjs.Items[i].Name];
+										UserDefinedFunction DbObj = (UserDefinedFunction)Parameter.Db.UserDefinedFunctions[Parameter.DbObjs.Items[i].Name, Parameter.DbObjs.Items[i].Schema];
 										if (DbObj == null || DbObj.IsSystemObject)
 										{
-											//throw new Exception("Can't find DbObj with name \"" + Parameter.DbObjs.Items[i].Name + "\".");
+											//throw new Exception("Can't find DbObj with name \"" + Parameter.DbObjs.Items[i].Schema + "." + Parameter.DbObjs.Items[i].Name + "\".");
 											Parameter.DbObjs.Items[i].IsSystem = true;
 											break;
 										}
@@ -94,10 +94,10 @@ namespace DbScripter
 									} break;
 								case DbObjType.Sp:
 									{
-										StoredProcedure DbObj = (StoredProcedure)Parameter.Db.StoredProcedures[Parameter.DbObjs.Items[i].Name];
+										StoredProcedure DbObj = (StoredProcedure)Parameter.Db.StoredProcedures[Parameter.DbObjs.Items[i].Name, Parameter.DbObjs.Items[i].Schema];
 										if (DbObj == null || DbObj.IsSystemObject)
 										{
-											//throw new Exception("Can't find DbObj with name \"" + Parameter.DbObjs.Items[i].Name + "\".");
+											//throw new Exception("Can't find DbObj with name \"" + Parameter.DbObjs.Items[i].Schema + "." + Parameter.DbObjs.Items[i].Name + "\".");
 											Parameter.DbObjs.Items[i].IsSystem = true;
 											break;
 										}

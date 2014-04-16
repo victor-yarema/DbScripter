@@ -25,6 +25,7 @@ namespace DbScripter
 					//so.Add(ScriptOption.WithDependencies);
 					so.Add(ScriptOption.ExtendedProperties);
 					so.Add(ScriptOption.FullTextIndexes);
+					so.Add(ScriptOption.SchemaQualifyForeignKeysReferences);
 				}
 
 				for (int i = Parameter.DbObjs_BeginIndex; i < Parameter.DbObjs_EndIndex; i++)

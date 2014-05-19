@@ -431,7 +431,8 @@ namespace DbScripter
 
 								for (int j = Script.Count - 1; j >= 2; j--)
 								{
-									if (Script[j].IndexOf(CHECK_CONSTRAINT) != -1)
+									if ((Script[j].IndexOf(CHECK_CONSTRAINT) != -1)
+										&& (Script[j].IndexOf(NOCHECK_CONSTRAINT) == -1))
 									{
 										Script.RemoveAt(j);
 									}
@@ -580,6 +581,7 @@ namespace DbScripter
 		const string SET_QUOTED_IDENTIFIER_ON = "SET QUOTED_IDENTIFIER ON";
 		const string CREATE_TABLE = "CREATE TABLE";
 		const string CHECK_CONSTRAINT = "CHECK CONSTRAINT";
+		const string NOCHECK_CONSTRAINT = "NOCHECK CONSTRAINT";
 		const string ALTER_TABLE = "ALTER TABLE";
 		const string FOREIGN_KEY = "FOREIGN KEY";
 		const string FOREIGN_KEY_ = FOREIGN_KEY + "(";
